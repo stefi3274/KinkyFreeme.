@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Kinky, Free Me</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background: var(--bg); }
+    /* No age gate on admin */
+  </style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- Admin Nav -->
+<nav class="site-nav" style="background:var(--bg2)">
+  <a href="index.html" class="nav-logo" style="margin-right:0">Kinky, <em>Free Me</em></a>
+  <span style="font-family:var(--font-label);font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);margin-right:auto;padding-left:16px">Admin</span>
+  <a href="index.html" class="nav-link">← View Site</a>
+</nav>
+
+<!-- Admin layout -->
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-label">Dashboard</div>
+    <div class="sidebar-item active" onclick="switchPane('overview',this)">📊 Overview</div>
+    <div class="sidebar-item" onclick="switchPane('new-post',this)">✍️ New Post</div>
+    <div class="sidebar-item" onclick="switchPane('all-posts',this)">📝 All Posts</div>
+    <div class="sidebar-item" onclick="switchPane('subscribers',this)">💌 Subscribers</div>
+    <div class="sidebar-label" style="margin-top:28px">Settings</div>
+    <div class="sidebar-item" onclick="switchPane('about-settings',this)">👤 About Page</div>
+    <div class="sidebar-item" onclick="switchPane('site-settings',this)">⚙️ Site Info</div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="admin-content">
+
+    <!-- ── Overview ──────────────────────────────────── -->
+    <div id="pane-overview" class="admin-pane active">
+      <div class="pane-title">Welcome back, Gia ✦</div>
+      <div class="pane-sub">Here's what's happening on Kinky, Free Me.</div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num" id="ov-published">0</div><div class="stat-lbl">Published posts</div></div>
+        <div class="stat-box"><div class="stat-num" id="ov-drafts">0</div><div class="stat-lbl">Drafts</div></div>
+        <div class="stat-box"><div class="stat-num" id="ov-subs">0</div><div class="stat-lbl">Subscribers</div></div>
+      </div>
+      <div class="admin-card">
+        <h3>Recent posts</h3>
+        <table class="data-table">
+          <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="ov-recent"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── New Post ──────────────────────────────────── -->
+    <div id="pane-new-post" class="admin-pane">
+      <div class="pane-title">New Post</div>
+      <div class="pane-sub">Write a new story and publish it — or save it as a draft to finish later.</div>
+      <div class="admin-card">
+        <div class="field">
+          <label>Title *</label>
+          <input type="text" id="np-title" placeholder="Give your story a title…">
+        </div>
+        <div class="field">
+          <label>Subtitle / Tagline</label>
+          <input type="text" id="np-subtitle" placeholder="A short mood-setting line (optional)…">
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="np-tag">
+            <option value="self-discovery">Self-Discovery</option>
+            <option value="submission">Submission</option>
+            <option value="bdsm">BDSM</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Cover Photo</label>
+          <div class="upload-zone" onclick="document.getElementById('np-photo-file').click()">
+            <span>📷</span>
+            <p>Click to choose a cover image</p>
+          </div>
+          <input type="file" id="np-photo-file" accept="image/*" style="display:none" onchange="previewImg(this,'np-photo-preview')">
+          <img id="np-photo-preview" class="photo-preview-img">
+        </div>
+        <div class="field">
+          <label>Body *</label>
+          <textarea id="np-body" placeholder="Write your story here. Each new line will become a new paragraph."></textarea>
+        </div>
+        <div class="field">
+          <label>Access</label>
+          <select id="np-premium">
+            <option value="no">Free — accessible to everyone</option>
+            <option value="yes">Members only — subscribers unlock it</option>
+          </select>
+        </div>
+        <div class="row-actions" style="margin-top:8px">
+          <button class="btn-save" onclick="savePost('published')">Publish Now</button>
+          <button class="btn-outline" onclick="savePost('draft')">Save as Draft</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── All Posts ─────────────────────────────────── -->
+    <div id="pane-all-posts" class="admin-pane">
+      <div class="pane-title">All Posts</div>
+      <div class="pane-sub">Your published stories and saved drafts.</div>
+      <div class="admin-card">
+        <table class="data-table">
+          <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Premium</th><th>Date</th><th></th></tr></thead>
+          <tbody id="posts-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Subscribers ───────────────────────────────── -->
+    <div id="pane-subscribers" class="admin-pane">
+      <div class="pane-title">Subscribers</div>
+      <div class="pane-sub">Your Inner Circle.</div>
+      <div class="stats-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="stat-box"><div class="stat-num" id="subs-total">0</div><div class="stat-lbl">Total</div></div>
+        <div class="stat-box"><div class="stat-num" id="subs-week">0</div><div class="stat-lbl">This week</div></div>
+        <div class="stat-box"><div class="stat-num">∞</div><div class="stat-lbl">Love</div></div>
+      </div>
+      <div class="admin-card">
+        <h3>Subscriber list</h3>
+        <table class="data-table">
+          <thead><tr><th>Email</th><th>Date</th></tr></thead>
+          <tbody id="subs-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── About Settings ────────────────────────────── -->
+    <div id="pane-about-settings" class="admin-pane">
+      <div class="pane-title">About Page</div>
+      <div class="pane-sub">Everything here will appear on your public About page.</div>
+      <div class="admin-card">
+        <h3>Your photo</h3>
+        <div class="upload-zone" onclick="document.getElementById('ab-photo-file').click()">
+          <span>🖼</span>
+          <p>Upload your portrait photo</p>
+        </div>
+        <input type="file" id="ab-photo-file" accept="image/*" style="display:none" onchange="previewImg(this,'ab-photo-preview')">
+        <img id="ab-photo-preview" class="photo-preview-img">
+      </div>
+      <div class="admin-card">
+        <h3>Your words</h3>
+        <div class="field">
+          <label>Main headline</label>
+          <input type="text" id="ab-headline" placeholder="e.g. I write because the silence was too heavy.">
+        </div>
+        <div class="field">
+          <label>Favorite quote (shown in italic)</label>
+          <input type="text" id="ab-quote" placeholder="e.g. Self acceptance is the most radical act.">
+        </div>
+        <div class="field">
+          <label>Biography</label>
+          <textarea id="ab-bio" style="min-height:200px" placeholder="Write your biography here. Each line becomes a paragraph."></textarea>
+        </div>
+        <div class="row-actions">
+          <button class="btn-save" onclick="saveAbout()">Save About Page</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Site Settings ─────────────────────────────── -->
+    <div id="pane-site-settings" class="admin-pane">
+      <div class="pane-title">Site Info</div>
+      <div class="pane-sub">Contact details and footer information. Visible on the About page and footer.</div>
+      <div class="admin-card">
+        <h3>Contact</h3>
+        <div class="field">
+          <label>Email address (public)</label>
+          <input type="email" id="ss-email" placeholder="e.g. gia@kinkyfreeme.com">
+        </div>
+        <div class="field">
+          <label>Mailing address (optional)</label>
+          <input type="text" id="ss-address" placeholder="City, Country — or leave blank">
+        </div>
+        <div class="field">
+          <label>Footer tagline</label>
+          <input type="text" id="ss-tagline" placeholder="e.g. Self discovery through self acceptance…" value="Self discovery through self acceptance and the discovery of pleasure.">
+        </div>
+        <div class="row-actions">
+          <button class="btn-save" onclick="saveSettings()">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /admin-content -->
+</div><!-- /admin-layout -->
+
+<script src="app.js"></script>
+<script>
+// ── Pane switching ─────────────────────────────────────
+function switchPane(name, el) {
+  document.querySelectorAll('.admin-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('pane-' + name).classList.add('active');
+  el.classList.add('active');
+  refreshData();
+}
+
+// ── Refresh all data ───────────────────────────────────
+function refreshData() {
+  const posts = KFM.getPosts();
+  const subs  = KFM.getSubs();
+  const pub   = posts.filter(p => p.status === 'published');
+  const drfs  = posts.filter(p => p.status === 'draft');
+
+  // Overview
+  setEl('ov-published', pub.length);
+  setEl('ov-drafts', drfs.length);
+  setEl('ov-subs', subs.length);
+  const ovRecent = document.getElementById('ov-recent');
+  if (ovRecent) ovRecent.innerHTML = posts.slice(-6).reverse().map(p => `
+    <tr>
+      <td>${p.title}</td>
+      <td>${KFM.tagLabel(p.tag)}</td>
+      <td><span class="status-pill ${p.status === 'published' ? 'pub' : 'draft'}">${p.status}</span></td>
+      <td>${KFM.formatDate(p.date)}</td>
+    </tr>`).join('') || '<tr><td colspan="4" style="color:var(--text-muted)">No posts yet.</td></tr>';
+
+  // All posts
+  const ptbody = document.getElementById('posts-tbody');
+  if (ptbody) ptbody.innerHTML = posts.map(p => `
+    <tr>
+      <td>${p.title}</td>
+      <td>${KFM.tagLabel(p.tag)}</td>
+      <td><span class="status-pill ${p.status === 'published' ? 'pub' : 'draft'}">${p.status}</span></td>
+      <td>${p.premium === 'yes' ? '✦' : '—'}</td>
+      <td>${KFM.formatDate(p.date)}</td>
+      <td>
+        <button class="tbl-btn" onclick="editPost(${p.id})">Edit</button>
+        <button class="tbl-btn del" onclick="deletePost(${p.id})">Delete</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="6" style="color:var(--text-muted);padding:16px">No posts yet.</td></tr>';
+
+  // Subscribers
+  setEl('subs-total', subs.length);
+  setEl('subs-week', subs.filter(s => (Date.now() - new Date(s.date)) < 7*86400000).length);
+  const stbody = document.getElementById('subs-tbody');
+  if (stbody) stbody.innerHTML = subs.map(s => `<tr><td>${s.email}</td><td>${s.date}</td></tr>`).join('')
+    || '<tr><td colspan="2" style="color:var(--text-muted);padding:16px">No subscribers yet.</td></tr>';
+}
+
+function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+// ── Save post ──────────────────────────────────────────
+function savePost(status) {
+  const title  = document.getElementById('np-title').value.trim();
+  const body   = document.getElementById('np-body').value.trim();
+  if (!title || !body) { showToast('Title and body are required.'); return; }
+
+  const preview = document.getElementById('np-photo-preview');
+  const photo   = (preview && preview.style.display === 'block') ? preview.src : null;
+
+  const posts = KFM.getPosts();
+  posts.unshift({
+    id: KFM.nextId(),
+    title,
+    subtitle: document.getElementById('np-subtitle').value.trim(),
+    tag:      document.getElementById('np-tag').value,
+    premium:  document.getElementById('np-premium').value,
+    body, status, photo,
+    date: new Date().toISOString().split('T')[0]
+  });
+  KFM.savePosts(posts);
+
+  // Reset form
+  ['np-title','np-subtitle','np-body'].forEach(id => document.getElementById(id).value = '');
+  if (preview) { preview.style.display = 'none'; preview.src = ''; }
+  document.getElementById('np-tag').value = 'self-discovery';
+  document.getElementById('np-premium').value = 'no';
+
+  showToast(status === 'published' ? 'Post published! ✦' : 'Draft saved.');
+  switchPane('all-posts', document.querySelectorAll('.sidebar-item')[2]);
+}
+
+// ── Edit post ──────────────────────────────────────────
+function editPost(id) {
+  const posts = KFM.getPosts();
+  const post  = posts.find(p => p.id === id);
+  if (!post) return;
+
+  document.getElementById('np-title').value    = post.title;
+  document.getElementById('np-subtitle').value = post.subtitle || '';
+  document.getElementById('np-tag').value      = post.tag;
+  document.getElementById('np-body').value     = post.body;
+  document.getElementById('np-premium').value  = post.premium;
+  if (post.photo) {
+    const prev = document.getElementById('np-photo-preview');
+    prev.src = post.photo; prev.style.display = 'block';
+  }
+  // Remove original so saving replaces it
+  KFM.savePosts(posts.filter(p => p.id !== id));
+
+  switchPane('new-post', document.querySelectorAll('.sidebar-item')[1]);
+}
+
+// ── Delete post ────────────────────────────────────────
+function deletePost(id) {
+  if (!confirm('Delete this post?')) return;
+  KFM.savePosts(KFM.getPosts().filter(p => p.id !== id));
+  refreshData();
+  showToast('Post deleted.');
+}
+
+// ── Photo preview ──────────────────────────────────────
+function previewImg(input, previewId) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById(previewId);
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// ── About settings ─────────────────────────────────────
+function saveAbout() {
+  const s = JSON.parse(localStorage.getItem('kfm_settings') || '{}');
+  s.bio_headline = document.getElementById('ab-headline').value.trim();
+  s.bio_quote    = document.getElementById('ab-quote').value.trim();
+  s.bio_text     = document.getElementById('ab-bio').value.trim();
+  const prev = document.getElementById('ab-photo-preview');
+  if (prev && prev.style.display === 'block') s.photo_about = prev.src;
+  localStorage.setItem('kfm_settings', JSON.stringify(s));
+  showToast('About page saved ✦');
+}
+
+// ── Site settings ──────────────────────────────────────
+function saveSettings() {
+  const s = JSON.parse(localStorage.getItem('kfm_settings') || '{}');
+  s.email   = document.getElementById('ss-email').value.trim();
+  s.address = document.getElementById('ss-address').value.trim();
+  s.tagline = document.getElementById('ss-tagline').value.trim();
+  localStorage.setItem('kfm_settings', JSON.stringify(s));
+  showToast('Settings saved.');
+}
+
+// ── Load saved settings into forms ────────────────────
+function loadSavedSettings() {
+  const s = JSON.parse(localStorage.getItem('kfm_settings') || '{}');
+  if (s.bio_headline) document.getElementById('ab-headline').value = s.bio_headline;
+  if (s.bio_quote)    document.getElementById('ab-quote').value    = s.bio_quote;
+  if (s.bio_text)     document.getElementById('ab-bio').value      = s.bio_text;
+  if (s.photo_about) {
+    const p = document.getElementById('ab-photo-preview');
+    p.src = s.photo_about; p.style.display = 'block';
+  }
+  if (s.email)   document.getElementById('ss-email').value   = s.email;
+  if (s.address) document.getElementById('ss-address').value = s.address;
+  if (s.tagline) document.getElementById('ss-tagline').value = s.tagline;
+}
+
+// ── Init ───────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadSavedSettings();
+  refreshData();
+});
+</script>
+</body>
+</html>

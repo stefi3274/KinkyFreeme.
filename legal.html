@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legal Mentions — Kinky, Free Me</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="age-gate"></div>
+<div id="toast"></div>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">Kinky, <em>Free Me</em></a>
+  <a href="index.html" class="nav-link">Home</a>
+  <a href="blog.html"  class="nav-link">Journal</a>
+  <a href="about.html" class="nav-link">About</a>
+  <button class="nav-cta" onclick="window.location='index.html#newsletter-anchor'">Subscribe</button>
+</nav>
+
+<div class="legal-wrap">
+  <h1>Legal Mentions</h1>
+  <p class="last-updated">Last updated: June 2026</p>
+
+  <!-- Age restriction — prominent -->
+  <div class="age-warning-box">
+    <p><strong>⚠ Adult Content — 18+ Only</strong></p>
+    <p style="margin-top:8px">
+      This website contains content of an adult nature, including explicit discussions of sexuality, BDSM practices, and erotic themes. Access to this site is strictly reserved for individuals who are <strong>18 years of age or older</strong> (or the age of majority in their jurisdiction, whichever is greater). By accessing this website, you confirm that you meet this age requirement and that you are not in a location where such content is prohibited by law.
+    </p>
+    <p style="margin-top:8px">
+      If you are under 18, or if adult content is illegal in your place of residence, you must leave this site immediately.
+    </p>
+  </div>
+
+  <h2>1. Site Identification</h2>
+  <p>
+    <strong>Kinky, Free Me</strong> is a personal blog operated under the pseudonym <em>Gia Curls</em>. The site is published at <strong>kinkyfreeme.com</strong>. For any inquiry, you may contact the author via the email address provided on the About page.
+  </p>
+
+  <h2>2. Content &amp; Editorial Policy</h2>
+  <p>
+    All written content published on this blog is original work authored by Gia Curls, unless otherwise stated. Articles, essays, and personal narratives reflect personal opinions and experiences and are provided for informational, entertainment, and educational purposes only. Nothing on this site constitutes professional medical, psychological, or legal advice.
+  </p>
+  <p>
+    The topics covered — including self-discovery, submission, and BDSM — are presented in the spirit of consensual adult exploration. The author advocates for informed consent, personal autonomy, and safety in all practices discussed.
+  </p>
+
+  <h2>3. Adult Content Warning</h2>
+  <p>
+    This site contains material intended exclusively for adults aged 18 and over. Some content may include:
+  </p>
+  <ul>
+    <li>Explicit or suggestive descriptions of adult themes and sexuality</li>
+    <li>Discussion of BDSM practices, power dynamics, and erotic experiences</li>
+    <li>Personal narratives involving intimate relationships and desire</li>
+  </ul>
+  <p>
+    By continuing to use this site, you affirm that you are of legal age to access such content in your jurisdiction, and that you do so voluntarily and with full awareness of its nature.
+  </p>
+
+  <h2>4. Premium Content &amp; Newsletter</h2>
+  <p>
+    Some content on this site is designated as <em>members-only</em> and is unlocked upon newsletter subscription. Subscription is free. By subscribing, you agree to receive occasional email communications from Kinky, Free Me. You may unsubscribe at any time by contacting the author directly.
+  </p>
+  <p>
+    Your email address will never be sold, shared with third parties, or used for any purpose other than blog communications.
+  </p>
+
+  <h2>5. Intellectual Property</h2>
+  <p>
+    All content on this site — including texts, images, and design — is the exclusive property of the author (Gia Curls) unless explicitly credited otherwise. Reproduction, distribution, or modification of any content without prior written permission is prohibited.
+  </p>
+
+  <h2>6. Privacy &amp; Data</h2>
+  <p>
+    This site collects only the email addresses voluntarily provided by visitors who choose to subscribe to the newsletter. No other personal data is collected, stored, or processed. This site does not use tracking cookies or advertising technologies.
+  </p>
+  <p>
+    You have the right to request deletion of your data at any time by contacting the author via the email address listed on the About page.
+  </p>
+
+  <h2>7. Limitation of Liability</h2>
+  <p>
+    The author makes no warranties regarding the accuracy, completeness, or fitness for any particular purpose of the content published. The author shall not be held liable for any damages arising from the use of this website or its content.
+  </p>
+
+  <h2>8. Governing Law</h2>
+  <p>
+    This site is operated in accordance with applicable law. Any dispute relating to the use of this website shall be governed by the laws of the country of residence of the site operator.
+  </p>
+
+  <p style="margin-top:48px;font-size:0.88rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:24px">
+    For any question regarding these mentions, please use the contact information on the <a href="about.html">About page</a>.
+  </p>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-bottom">
+    <span>© <span id="yr"></span> Kinky, Free Me · All rights reserved</span>
+    <a href="index.html" style="font-family:var(--font-display);font-style:italic">kinkyfreeme.com</a>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  document.getElementById('age-gate').outerHTML = `
+  <div id="age-gate">
+    <div class="age-box">
+      <div class="logo-ag">Kinky, <em>Free Me</em></div>
+      <div class="age-line"></div>
+      <h2>Are you 18 or older?</h2>
+      <p>This site contains adult content. Please confirm your age to continue.</p>
+      <div class="age-btns">
+        <button class="btn btn-primary" onclick="ageConfirm()">Yes, I'm 18+</button>
+        <button class="btn btn-ghost" onclick="ageLeave()">No, take me back</button>
+      </div>
+    </div>
+  </div>`;
+</script>
+</body>
+</html>

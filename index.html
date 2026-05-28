@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kinky, Free Me</title>
+  <meta name="description" content="Self discovery through self acceptance and the discovery of pleasure. A journal by Gia Curls.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Age Gate -->
+<div id="age-gate">
+  <div class="age-box">
+    <div class="logo-ag">Kinky, <em>Free Me</em></div>
+    <div class="age-line"></div>
+    <h2>Are you 18 or older?</h2>
+    <p>This site contains content intended for adults. Please confirm your age to continue.</p>
+    <div class="age-btns">
+      <button class="btn btn-primary" onclick="ageConfirm()">Yes, I'm 18+</button>
+      <button class="btn btn-ghost" onclick="ageLeave()">No, take me back</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Nav -->
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">Kinky, <em>Free Me</em></a>
+  <a href="index.html"  class="nav-link">Home</a>
+  <a href="blog.html"   class="nav-link">Journal</a>
+  <a href="about.html"  class="nav-link">About</a>
+  <button class="nav-cta" onclick="document.getElementById('newsletter-anchor').scrollIntoView({behavior:'smooth'})">Subscribe</button>
+</nav>
+
+<!-- Hero -->
+<section style="min-height:88vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px 48px;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 40%, rgba(176,84,112,0.07) 0%, transparent 70%);pointer-events:none"></div>
+  <p class="section-label anim anim-1">A journal by Gia Curls</p>
+  <h1 style="font-family:var(--font-display);font-size:clamp(3.8rem,10vw,8.5rem);font-weight:300;line-height:0.97;color:var(--text);margin-bottom:6px" class="anim anim-2">
+    Kinky, <em style="color:var(--accent);font-style:italic">Free</em> Me
+  </h1>
+  <p style="font-family:var(--font-display);font-size:clamp(1rem,2.4vw,1.35rem);font-style:italic;font-weight:300;color:var(--text-muted);max-width:520px;margin:20px auto 44px" class="anim anim-3">
+    Self discovery through self acceptance<br>and the discovery of pleasure.
+  </p>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center" class="anim anim-4">
+    <a href="blog.html" class="btn btn-primary">Read the Journal</a>
+    <button class="btn btn-ghost" onclick="document.getElementById('newsletter-anchor').scrollIntoView({behavior:'smooth'})">Join the Circle</button>
+  </div>
+</section>
+
+<!-- Latest posts -->
+<section class="section">
+  <p class="section-label">Latest Stories</p>
+  <h2 class="section-title">From the Journal</h2>
+  <div class="divider"></div>
+  <div class="blog-grid" id="home-posts">
+    <p style="color:var(--text-muted);font-size:0.9rem">No posts yet — write your first story from the Admin panel.</p>
+  </div>
+  <div style="text-align:center;margin-top:44px">
+    <a href="blog.html" class="btn btn-ghost">View all posts</a>
+  </div>
+</section>
+
+<!-- Categories band -->
+<section class="section section--alt">
+  <p class="section-label">Explore</p>
+  <h2 class="section-title">What lives here</h2>
+  <div class="divider"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;margin-top:40px">
+    <a href="blog.html?tag=self-discovery" style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:36px 28px;text-align:center;transition:box-shadow 0.2s;display:block">
+      <div style="font-size:2.2rem;margin-bottom:14px">🌸</div>
+      <div style="font-family:var(--font-display);font-size:1.25rem;font-style:italic;color:var(--text);margin-bottom:8px">Self-Discovery</div>
+      <div style="font-size:0.84rem;color:var(--text-muted)">Understanding who you are beyond what you were told to be.</div>
+    </a>
+    <a href="blog.html?tag=submission" style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:36px 28px;text-align:center;transition:box-shadow 0.2s;display:block">
+      <div style="font-size:2.2rem;margin-bottom:14px">🌑</div>
+      <div style="font-family:var(--font-display);font-size:1.25rem;font-style:italic;color:var(--text);margin-bottom:8px">Submission</div>
+      <div style="font-size:0.84rem;color:var(--text-muted)">The radical freedom found in conscious surrender.</div>
+    </a>
+    <a href="blog.html?tag=bdsm" style="background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:36px 28px;text-align:center;transition:box-shadow 0.2s;display:block">
+      <div style="font-size:2.2rem;margin-bottom:14px">🔗</div>
+      <div style="font-family:var(--font-display);font-size:1.25rem;font-style:italic;color:var(--text);margin-bottom:8px">BDSM</div>
+      <div style="font-size:0.84rem;color:var(--text-muted)">Exploring power, pleasure, and consent with intention.</div>
+    </a>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<div id="newsletter-anchor">
+  <div class="newsletter-band">
+    <p class="section-label">The Inner Circle</p>
+    <h2>Stay in the know</h2>
+    <p>Intimate essays and content that doesn't live on the feed — once a week, in your inbox.</p>
+    <div class="newsletter-row">
+      <input type="email" id="ns-email" placeholder="your@email.com">
+      <button onclick="subscribe('ns-email','ns-ok')">Subscribe</button>
+    </div>
+    <p class="ns-success" id="ns-ok">Welcome to the circle. ✦</p>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">Kinky, <em>Free Me</em></div>
+      <p class="footer-tagline" id="footer-tagline">Self discovery through self acceptance and the discovery of pleasure.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="blog.html">Journal</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Info</h4>
+      <ul>
+        <li><a href="legal.html">Legal Mentions</a></li>
+        <li id="footer-contact-li" style="display:none"><a href="#" id="footer-email-link">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="yr"></span> Kinky, Free Me · All rights reserved</span>
+    <span style="font-family:var(--font-display);font-style:italic">kinkyfreeme.com</span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+  // Year
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Load latest 3 published posts
+  const posts = KFM.getPosts().filter(p => p.status === 'published').slice(0, 3);
+  if (posts.length > 0) {
+    document.getElementById('home-posts').innerHTML = posts.map(buildCard).join('');
+  }
+
+  // Footer contact from settings
+  const settings = JSON.parse(localStorage.getItem('kfm_settings') || '{}');
+  if (settings.email) {
+    document.getElementById('footer-contact-li').style.display = 'block';
+    document.getElementById('footer-email-link').href = 'mailto:' + settings.email;
+    document.getElementById('footer-email-link').textContent = 'Contact';
+  }
+</script>
+</body>
+</html>

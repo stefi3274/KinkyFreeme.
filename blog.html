@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Journal — Kinky, Free Me</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="age-gate"></div>
+<div id="toast"></div>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">Kinky, <em>Free Me</em></a>
+  <a href="index.html"  class="nav-link">Home</a>
+  <a href="blog.html"   class="nav-link active">Journal</a>
+  <a href="about.html"  class="nav-link">About</a>
+  <button class="nav-cta" onclick="window.location='index.html#newsletter-anchor'">Subscribe</button>
+</nav>
+
+<!-- Page hero -->
+<div class="page-hero">
+  <p class="page-hero-label anim anim-1">The Journal</p>
+  <h1 class="page-hero-title anim anim-2">All <em>Stories</em></h1>
+  <p class="page-hero-sub anim anim-3">Essays on pleasure, identity, and becoming.</p>
+</div>
+
+<!-- Filter tabs -->
+<div style="display:flex;gap:10px;flex-wrap:wrap;padding:28px 48px;border-bottom:1px solid var(--border)">
+  <button class="filter-btn btn btn-ghost" data-tag="" onclick="filterPosts('',this)" style="padding:8px 20px;font-size:0.68rem">All</button>
+  <button class="filter-btn btn btn-ghost" data-tag="self-discovery" onclick="filterPosts('self-discovery',this)" style="padding:8px 20px;font-size:0.68rem">Self-Discovery</button>
+  <button class="filter-btn btn btn-ghost" data-tag="submission" onclick="filterPosts('submission',this)" style="padding:8px 20px;font-size:0.68rem">Submission</button>
+  <button class="filter-btn btn btn-ghost" data-tag="bdsm" onclick="filterPosts('bdsm',this)" style="padding:8px 20px;font-size:0.68rem">BDSM</button>
+</div>
+
+<section class="section">
+  <div class="blog-grid" id="blog-grid">
+    <p style="color:var(--text-muted);font-size:0.9rem">No stories yet.</p>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<div class="newsletter-band">
+  <p class="section-label">The Inner Circle</p>
+  <h2>Never miss a story</h2>
+  <p>Once a week — no noise, just writing.</p>
+  <div class="newsletter-row">
+    <input type="email" id="ns-email" placeholder="your@email.com">
+    <button onclick="subscribe('ns-email','ns-ok')">Subscribe</button>
+  </div>
+  <p class="ns-success" id="ns-ok">You're in. ✦</p>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">Kinky, <em>Free Me</em></div>
+      <p class="footer-tagline">Self discovery through self acceptance and the discovery of pleasure.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="blog.html">Journal</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Info</h4>
+      <ul><li><a href="legal.html">Legal Mentions</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="yr"></span> Kinky, Free Me</span>
+    <span style="font-family:var(--font-display);font-style:italic">kinkyfreeme.com</span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Age gate inline build
+  document.getElementById('age-gate').outerHTML = `
+  <div id="age-gate">
+    <div class="age-box">
+      <div class="logo-ag">Kinky, <em>Free Me</em></div>
+      <div class="age-line"></div>
+      <h2>Are you 18 or older?</h2>
+      <p>This site contains adult content. Please confirm your age to continue.</p>
+      <div class="age-btns">
+        <button class="btn btn-primary" onclick="ageConfirm()">Yes, I'm 18+</button>
+        <button class="btn btn-ghost" onclick="ageLeave()">No, take me back</button>
+      </div>
+    </div>
+  </div>`;
+
+  let currentTag = '';
+
+  // Check URL param
+  const params = new URLSearchParams(location.search);
+  if (params.get('tag')) currentTag = params.get('tag');
+
+  function renderGrid(tag) {
+    const all = KFM.getPosts().filter(p => p.status === 'published');
+    const filtered = tag ? all.filter(p => p.tag === tag) : all;
+    const grid = document.getElementById('blog-grid');
+    grid.innerHTML = filtered.length
+      ? filtered.map(buildCard).join('')
+      : `<p style="color:var(--text-muted);font-size:0.9rem">No stories in this category yet.</p>`;
+  }
+
+  function filterPosts(tag, btn) {
+    currentTag = tag;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.style.background = 'transparent';
+      b.style.color = 'var(--text-muted)';
+      b.style.borderColor = 'var(--border)';
+    });
+    btn.style.background = 'var(--accent)';
+    btn.style.color = '#fff';
+    btn.style.borderColor = 'var(--accent)';
+    renderGrid(tag);
+  }
+
+  // Set initial active filter
+  renderGrid(currentTag);
+  if (currentTag) {
+    const btn = document.querySelector(`[data-tag="${currentTag}"]`);
+    if (btn) filterPosts(currentTag, btn);
+  } else {
+    const all = document.querySelector('[data-tag=""]');
+    if (all) filterPosts('', all);
+  }
+</script>
+</body>
+</html>
