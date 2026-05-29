@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ── Load design from Supabase for public pages ───────────
-const THEMES = {
+const PUB_THEMES = {
   rose:  {'--bg':'#fdf8f5','--bg2':'#f7f0ea','--bg3':'#f0e6dd','--surface':'#ffffff','--accent':'#b05470','--accent2':'#d4849a','--accent-lt':'#f4dde4','--text':'#2a1a22','--text-mid':'#6a4a56','--text-muted':'#a07888','--border':'rgba(176,84,112,0.14)','--shadow':'rgba(176,84,112,0.08)','--glow':'rgba(176,84,112,0.10)'},
   noir:  {'--bg':'#0d0d0d','--bg2':'#141414','--bg3':'#1a1a1a','--surface':'#1f1f1f','--accent':'#d4af6e','--accent2':'#e8cfa0','--accent-lt':'#2a2318','--text':'#f0ead8','--text-mid':'#b8a880','--text-muted':'#7a6a50','--border':'rgba(212,175,110,0.15)','--shadow':'rgba(212,175,110,0.08)','--glow':'rgba(212,175,110,0.08)'},
   blush: {'--bg':'#fff3f5','--bg2':'#ffe8ed','--bg3':'#ffd8e0','--surface':'#ffffff','--accent':'#d45070','--accent2':'#e890a8','--accent-lt':'#fde0e8','--text':'#3a1020','--text-mid':'#7a3048','--text-muted':'#b07088','--border':'rgba(212,80,112,0.15)','--shadow':'rgba(212,80,112,0.08)','--glow':'rgba(212,80,112,0.08)'},
@@ -124,8 +124,8 @@ async function loadPublicDesign() {
   try {
     const { data } = await _sb.from('settings').select('theme,font,font_size').eq('id',1).single();
     if (!data) return;
-    if (data.theme && THEMES[data.theme]) {
-      Object.entries(THEMES[data.theme]).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
+    if (data.theme && PUB_THEMES[data.theme]) {
+      Object.entries(PUB_THEMES[data.theme]).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
     }
     if (data.font && PUB_FONTS[data.font]) {
       document.documentElement.style.setProperty('--font-display', PUB_FONTS[data.font]);
