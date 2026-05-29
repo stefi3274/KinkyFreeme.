@@ -64,7 +64,10 @@
     <div class="logo">Kinky, <em>Free Me</em></div>
     <div class="sub">Admin Access</div>
     <input type="email" id="login-email" placeholder="kinkyfreeme@gmail.com" value="kinkyfreeme@gmail.com">
-    <input type="password" id="login-pw" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div style="position:relative;margin-bottom:12px">
+      <input type="password" id="login-pw" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()" style="margin-bottom:0;padding-right:48px;width:100%">
+      <span onclick="togglePw('login-pw',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.1rem;user-select:none">👁</span>
+    </div>
     <button onclick="doLogin()">Enter</button>
     <div class="login-error" id="login-error">Incorrect email or password.</div>
     <span class="login-forgot" onclick="doReset()">Forgot your password?</span>
@@ -74,7 +77,25 @@
   </div>
 </div>
 
-<!-- ══ ADMIN ═══════════════════════════════════════════════ -->
+<!-- ══ RESET PASSWORD SCREEN ══════════════════════════════ -->
+<div id="reset-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);align-items:center;justify-content:center;padding:32px">
+  <div class="login-box">
+    <div class="logo">Kinky, <em>Free Me</em></div>
+    <div class="sub">Create New Password</div>
+    <div style="position:relative;margin-bottom:12px">
+      <input type="password" id="reset-pw1" placeholder="New password (min. 6 characters)" style="margin-bottom:0;padding-right:48px;width:100%">
+      <span onclick="togglePw('reset-pw1',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.1rem;user-select:none">👁</span>
+    </div>
+    <div style="position:relative;margin-bottom:12px">
+      <input type="password" id="reset-pw2" placeholder="Confirm new password" onkeydown="if(event.key==='Enter')doResetSave()" style="margin-bottom:0;padding-right:48px;width:100%">
+      <span onclick="togglePw('reset-pw2',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.1rem;user-select:none">👁</span>
+    </div>
+    <button onclick="doResetSave()">Save New Password</button>
+    <div class="login-error" id="reset-error"></div>
+  </div>
+</div>
+
+
 <div id="admin-panel" style="display:none">
 
 <nav class="site-nav" style="background:var(--bg2)">
@@ -309,11 +330,17 @@
         <h3>Change password</h3>
         <div class="field">
           <label>New password</label>
-          <input type="password" id="pw-new" placeholder="Minimum 6 characters">
+          <div style="position:relative">
+            <input type="password" id="pw-new" placeholder="Minimum 6 characters" style="padding-right:48px;width:100%">
+            <span onclick="togglePw('pw-new',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.1rem;user-select:none">👁</span>
+          </div>
         </div>
         <div class="field">
           <label>Confirm new password</label>
-          <input type="password" id="pw-confirm" placeholder="Repeat your new password">
+          <div style="position:relative">
+            <input type="password" id="pw-confirm" placeholder="Repeat your new password" style="padding-right:48px;width:100%">
+            <span onclick="togglePw('pw-confirm',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.1rem;user-select:none">👁</span>
+          </div>
         </div>
         <div class="row-actions">
           <button class="btn-save" onclick="changePassword()">Update Password</button>
@@ -339,6 +366,18 @@
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script>
+
+// ══ TOGGLE PASSWORD VISIBILITY ════════════════════════════
+function togglePw(inputId, eye) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    eye.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    eye.textContent = '👁';
+  }
+}
 
 // ══ THEMES ════════════════════════════════════════════════
 const THEMES = {
@@ -402,8 +441,32 @@ function openAdmin() {
   loadDesignState();
 }
 
+async function doResetSave() {
+  const pw1 = document.getElementById('reset-pw1').value;
+  const pw2 = document.getElementById('reset-pw2').value;
+  const err = document.getElementById('reset-error');
+  if (!pw1 || pw1.length < 6) { err.textContent = 'Minimum 6 characters.'; err.style.display='block'; return; }
+  if (pw1 !== pw2) { err.textContent = 'Passwords do not match.'; err.style.display='block'; return; }
+  const { error } = await _sb.auth.updateUser({ password: pw1 });
+  if (error) { err.textContent = 'Error. Try again.'; err.style.display='block'; return; }
+  document.getElementById('reset-screen').style.display = 'none';
+  showToast('Password updated — please log in ✦');
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
 // Check if already logged in
 async function checkSession() {
+  // Handle password recovery redirect from email link
+  const hash = window.location.hash;
+  if (hash.includes('type=recovery') || hash.includes('access_token')) {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session) {
+      document.getElementById('login-screen').style.display = 'none';
+      const rs = document.getElementById('reset-screen');
+      rs.style.display = 'flex';
+      return;
+    }
+  }
   const { data: { session } } = await _sb.auth.getSession();
   if (session) openAdmin();
 }
