@@ -77,6 +77,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script src="app.js"></script>
 <script>
   document.getElementById('yr').textContent = new Date().getFullYear();
@@ -136,3 +138,19 @@
 </script>
 </body>
 </html>
+<script>
+// Override renderGrid with Supabase
+async function renderGrid(tag) {
+  const grid = document.getElementById('blog-grid');
+  grid.innerHTML = '<p style="color:var(--text-muted)">Loading…</p>';
+  let query = _sb.from('posts').select('*').eq('status','published').order('created_at',{ascending:false});
+  if (tag) query = query.eq('tag', tag);
+  const { data: posts } = await query;
+  grid.innerHTML = (posts && posts.length)
+    ? posts.map(buildCard).join('')
+    : '<p style="color:var(--text-muted);font-size:0.9rem">No stories in this category yet.</p>';
+}
+document.getElementById('yr').textContent = new Date().getFullYear();
+renderGrid('');
+document.querySelector('[data-tag=""]').style.cssText = 'background:var(--accent);color:#fff;border-color:var(--accent)';
+</script>

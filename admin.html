@@ -5,26 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Kinky, Free Me</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    body { background: var(--bg); }
-    /* No age gate on admin */
-  </style>
 </head>
 <body>
 
 <div id="toast"></div>
 
-<!-- Admin Nav -->
 <nav class="site-nav" style="background:var(--bg2)">
-  <a href="index.html" class="nav-logo" style="margin-right:0">Kinky, <em>Free Me</em></a>
+  <a href="index.html" class="nav-logo">Kinky, <em>Free Me</em></a>
   <span style="font-family:var(--font-label);font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);margin-right:auto;padding-left:16px">Admin</span>
   <a href="index.html" class="nav-link">← View Site</a>
 </nav>
 
-<!-- Admin layout -->
 <div class="admin-layout">
-
-  <!-- Sidebar -->
   <aside class="admin-sidebar">
     <div class="sidebar-label">Dashboard</div>
     <div class="sidebar-item active" onclick="switchPane('overview',this)">📊 Overview</div>
@@ -36,32 +28,32 @@
     <div class="sidebar-item" onclick="switchPane('site-settings',this)">⚙️ Site Info</div>
   </aside>
 
-  <!-- Main content -->
   <div class="admin-content">
 
-    <!-- ── Overview ──────────────────────────────────── -->
+    <!-- Overview -->
     <div id="pane-overview" class="admin-pane active">
       <div class="pane-title">Welcome back, Gia ✦</div>
       <div class="pane-sub">Here's what's happening on Kinky, Free Me.</div>
       <div class="stats-row">
-        <div class="stat-box"><div class="stat-num" id="ov-published">0</div><div class="stat-lbl">Published posts</div></div>
-        <div class="stat-box"><div class="stat-num" id="ov-drafts">0</div><div class="stat-lbl">Drafts</div></div>
-        <div class="stat-box"><div class="stat-num" id="ov-subs">0</div><div class="stat-lbl">Subscribers</div></div>
+        <div class="stat-box"><div class="stat-num" id="ov-published">—</div><div class="stat-lbl">Published posts</div></div>
+        <div class="stat-box"><div class="stat-num" id="ov-drafts">—</div><div class="stat-lbl">Drafts</div></div>
+        <div class="stat-box"><div class="stat-num" id="ov-subs">—</div><div class="stat-lbl">Subscribers</div></div>
       </div>
       <div class="admin-card">
         <h3>Recent posts</h3>
         <table class="data-table">
           <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Date</th></tr></thead>
-          <tbody id="ov-recent"></tbody>
+          <tbody id="ov-recent"><tr><td colspan="4" style="color:var(--text-muted)">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- ── New Post ──────────────────────────────────── -->
+    <!-- New Post -->
     <div id="pane-new-post" class="admin-pane">
       <div class="pane-title">New Post</div>
-      <div class="pane-sub">Write a new story and publish it — or save it as a draft to finish later.</div>
+      <div class="pane-sub">Write a new story and publish it — or save it as a draft.</div>
       <div class="admin-card">
+        <input type="hidden" id="np-edit-id">
         <div class="field">
           <label>Title *</label>
           <input type="text" id="np-title" placeholder="Give your story a title…">
@@ -79,17 +71,13 @@
           </select>
         </div>
         <div class="field">
-          <label>Cover Photo</label>
-          <div class="upload-zone" onclick="document.getElementById('np-photo-file').click()">
-            <span>📷</span>
-            <p>Click to choose a cover image</p>
-          </div>
-          <input type="file" id="np-photo-file" accept="image/*" style="display:none" onchange="previewImg(this,'np-photo-preview')">
-          <img id="np-photo-preview" class="photo-preview-img">
+          <label>Cover Photo URL</label>
+          <input type="url" id="np-photo" placeholder="https://… (paste an image URL)">
+          <small style="color:var(--text-muted);font-size:0.78rem;margin-top:4px">Upload your image to imgbb.com or similar, then paste the link here.</small>
         </div>
         <div class="field">
           <label>Body *</label>
-          <textarea id="np-body" placeholder="Write your story here. Each new line will become a new paragraph."></textarea>
+          <textarea id="np-body" placeholder="Write your story here. Each new line becomes a new paragraph." style="min-height:220px"></textarea>
         </div>
         <div class="field">
           <label>Access</label>
@@ -101,52 +89,52 @@
         <div class="row-actions" style="margin-top:8px">
           <button class="btn-save" onclick="savePost('published')">Publish Now</button>
           <button class="btn-outline" onclick="savePost('draft')">Save as Draft</button>
+          <button class="btn-outline" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none">Cancel Edit</button>
         </div>
       </div>
     </div>
 
-    <!-- ── All Posts ─────────────────────────────────── -->
+    <!-- All Posts -->
     <div id="pane-all-posts" class="admin-pane">
       <div class="pane-title">All Posts</div>
       <div class="pane-sub">Your published stories and saved drafts.</div>
       <div class="admin-card">
         <table class="data-table">
           <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Premium</th><th>Date</th><th></th></tr></thead>
-          <tbody id="posts-tbody"></tbody>
+          <tbody id="posts-tbody"><tr><td colspan="6" style="color:var(--text-muted)">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- ── Subscribers ───────────────────────────────── -->
+    <!-- Subscribers -->
     <div id="pane-subscribers" class="admin-pane">
       <div class="pane-title">Subscribers</div>
       <div class="pane-sub">Your Inner Circle.</div>
-      <div class="stats-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="stat-box"><div class="stat-num" id="subs-total">0</div><div class="stat-lbl">Total</div></div>
-        <div class="stat-box"><div class="stat-num" id="subs-week">0</div><div class="stat-lbl">This week</div></div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num" id="subs-total">—</div><div class="stat-lbl">Total</div></div>
+        <div class="stat-box"><div class="stat-num" id="subs-week">—</div><div class="stat-lbl">This week</div></div>
         <div class="stat-box"><div class="stat-num">∞</div><div class="stat-lbl">Love</div></div>
       </div>
       <div class="admin-card">
         <h3>Subscriber list</h3>
         <table class="data-table">
           <thead><tr><th>Email</th><th>Date</th></tr></thead>
-          <tbody id="subs-tbody"></tbody>
+          <tbody id="subs-tbody"><tr><td colspan="2" style="color:var(--text-muted)">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- ── About Settings ────────────────────────────── -->
+    <!-- About Settings -->
     <div id="pane-about-settings" class="admin-pane">
       <div class="pane-title">About Page</div>
       <div class="pane-sub">Everything here will appear on your public About page.</div>
       <div class="admin-card">
         <h3>Your photo</h3>
-        <div class="upload-zone" onclick="document.getElementById('ab-photo-file').click()">
-          <span>🖼</span>
-          <p>Upload your portrait photo</p>
+        <div class="field">
+          <label>Photo URL</label>
+          <input type="url" id="ab-photo" placeholder="https://… (paste your portrait image URL)">
+          <small style="color:var(--text-muted);font-size:0.78rem;margin-top:4px">Upload to imgbb.com then paste the link.</small>
         </div>
-        <input type="file" id="ab-photo-file" accept="image/*" style="display:none" onchange="previewImg(this,'ab-photo-preview')">
-        <img id="ab-photo-preview" class="photo-preview-img">
       </div>
       <div class="admin-card">
         <h3>Your words</h3>
@@ -168,10 +156,10 @@
       </div>
     </div>
 
-    <!-- ── Site Settings ─────────────────────────────── -->
+    <!-- Site Settings -->
     <div id="pane-site-settings" class="admin-pane">
       <div class="pane-title">Site Info</div>
-      <div class="pane-sub">Contact details and footer information. Visible on the About page and footer.</div>
+      <div class="pane-sub">Contact details and footer information.</div>
       <div class="admin-card">
         <h3>Contact</h3>
         <div class="field">
@@ -184,7 +172,7 @@
         </div>
         <div class="field">
           <label>Footer tagline</label>
-          <input type="text" id="ss-tagline" placeholder="e.g. Self discovery through self acceptance…" value="Self discovery through self acceptance and the discovery of pleasure.">
+          <input type="text" id="ss-tagline" placeholder="Self discovery through self acceptance…">
         </div>
         <div class="row-actions">
           <button class="btn-save" onclick="saveSettings()">Save</button>
@@ -192,9 +180,18 @@
       </div>
     </div>
 
-  </div><!-- /admin-content -->
-</div><!-- /admin-layout -->
+  </div>
+</div>
 
+<!-- Footer credit -->
+<footer style="text-align:center;padding:20px;border-top:1px solid var(--border);background:var(--bg2)">
+  <span style="font-size:0.72rem;color:var(--text-muted);font-family:var(--font-label);letter-spacing:0.12em">
+    Created by <a href="#" style="color:var(--accent)">SteFi Services</a>
+  </span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script src="app.js"></script>
 <script>
 // ── Pane switching ─────────────────────────────────────
@@ -203,168 +200,178 @@ function switchPane(name, el) {
   document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
   document.getElementById('pane-' + name).classList.add('active');
   el.classList.add('active');
-  refreshData();
+  loadPane(name);
 }
 
-// ── Refresh all data ───────────────────────────────────
-function refreshData() {
-  const posts = KFM.getPosts();
-  const subs  = KFM.getSubs();
-  const pub   = posts.filter(p => p.status === 'published');
-  const drfs  = posts.filter(p => p.status === 'draft');
+async function loadPane(name) {
+  if (name === 'overview')      await loadOverview();
+  if (name === 'all-posts')     await loadAllPosts();
+  if (name === 'subscribers')   await loadSubscribers();
+  if (name === 'about-settings')await loadAboutForm();
+  if (name === 'site-settings') await loadSiteForm();
+}
 
-  // Overview
-  setEl('ov-published', pub.length);
-  setEl('ov-drafts', drfs.length);
-  setEl('ov-subs', subs.length);
-  const ovRecent = document.getElementById('ov-recent');
-  if (ovRecent) ovRecent.innerHTML = posts.slice(-6).reverse().map(p => `
+// ── Overview ───────────────────────────────────────────
+async function loadOverview() {
+  const { data: posts } = await _sb.from('posts').select('id,title,tag,status,created_at').order('created_at',{ascending:false});
+  const { count: subCount } = await _sb.from('subscribers').select('*',{count:'exact',head:true});
+
+  const pub   = (posts||[]).filter(p=>p.status==='published').length;
+  const drfs  = (posts||[]).filter(p=>p.status==='draft').length;
+  setEl('ov-published', pub);
+  setEl('ov-drafts', drfs);
+  setEl('ov-subs', subCount || 0);
+
+  const tbody = document.getElementById('ov-recent');
+  tbody.innerHTML = (posts||[]).slice(0,6).map(p=>`
     <tr>
       <td>${p.title}</td>
       <td>${KFM.tagLabel(p.tag)}</td>
-      <td><span class="status-pill ${p.status === 'published' ? 'pub' : 'draft'}">${p.status}</span></td>
-      <td>${KFM.formatDate(p.date)}</td>
+      <td><span class="status-pill ${p.status==='published'?'pub':'draft'}">${p.status}</span></td>
+      <td>${KFM.formatDate(p.created_at)}</td>
     </tr>`).join('') || '<tr><td colspan="4" style="color:var(--text-muted)">No posts yet.</td></tr>';
+}
 
-  // All posts
-  const ptbody = document.getElementById('posts-tbody');
-  if (ptbody) ptbody.innerHTML = posts.map(p => `
+// ── All posts ──────────────────────────────────────────
+async function loadAllPosts() {
+  const { data: posts } = await _sb.from('posts').select('*').order('created_at',{ascending:false});
+  const tbody = document.getElementById('posts-tbody');
+  tbody.innerHTML = (posts||[]).map(p=>`
     <tr>
       <td>${p.title}</td>
       <td>${KFM.tagLabel(p.tag)}</td>
-      <td><span class="status-pill ${p.status === 'published' ? 'pub' : 'draft'}">${p.status}</span></td>
-      <td>${p.premium === 'yes' ? '✦' : '—'}</td>
-      <td>${KFM.formatDate(p.date)}</td>
+      <td><span class="status-pill ${p.status==='published'?'pub':'draft'}">${p.status}</span></td>
+      <td>${p.premium==='yes'?'✦':'—'}</td>
+      <td>${KFM.formatDate(p.created_at)}</td>
       <td>
         <button class="tbl-btn" onclick="editPost(${p.id})">Edit</button>
         <button class="tbl-btn del" onclick="deletePost(${p.id})">Delete</button>
       </td>
     </tr>`).join('') || '<tr><td colspan="6" style="color:var(--text-muted);padding:16px">No posts yet.</td></tr>';
-
-  // Subscribers
-  setEl('subs-total', subs.length);
-  setEl('subs-week', subs.filter(s => (Date.now() - new Date(s.date)) < 7*86400000).length);
-  const stbody = document.getElementById('subs-tbody');
-  if (stbody) stbody.innerHTML = subs.map(s => `<tr><td>${s.email}</td><td>${s.date}</td></tr>`).join('')
-    || '<tr><td colspan="2" style="color:var(--text-muted);padding:16px">No subscribers yet.</td></tr>';
 }
 
-function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
-
-// ── Save post ──────────────────────────────────────────
-function savePost(status) {
-  const title  = document.getElementById('np-title').value.trim();
-  const body   = document.getElementById('np-body').value.trim();
+// ── Save post (create or update) ───────────────────────
+async function savePost(status) {
+  const title   = document.getElementById('np-title').value.trim();
+  const body    = document.getElementById('np-body').value.trim();
   if (!title || !body) { showToast('Title and body are required.'); return; }
 
-  const preview = document.getElementById('np-photo-preview');
-  const photo   = (preview && preview.style.display === 'block') ? preview.src : null;
-
-  const posts = KFM.getPosts();
-  posts.unshift({
-    id: KFM.nextId(),
+  const payload = {
     title,
-    subtitle: document.getElementById('np-subtitle').value.trim(),
+    subtitle: document.getElementById('np-subtitle').value.trim() || null,
     tag:      document.getElementById('np-tag').value,
     premium:  document.getElementById('np-premium').value,
-    body, status, photo,
-    date: new Date().toISOString().split('T')[0]
-  });
-  KFM.savePosts(posts);
+    photo_url:document.getElementById('np-photo').value.trim() || null,
+    body, status
+  };
 
-  // Reset form
-  ['np-title','np-subtitle','np-body'].forEach(id => document.getElementById(id).value = '');
-  if (preview) { preview.style.display = 'none'; preview.src = ''; }
-  document.getElementById('np-tag').value = 'self-discovery';
-  document.getElementById('np-premium').value = 'no';
+  const editId = document.getElementById('np-edit-id').value;
+  let error;
+  if (editId) {
+    ({ error } = await _sb.from('posts').update(payload).eq('id', editId));
+  } else {
+    ({ error } = await _sb.from('posts').insert(payload));
+  }
 
+  if (error) { showToast('Error saving post.'); console.error(error); return; }
+
+  resetPostForm();
   showToast(status === 'published' ? 'Post published! ✦' : 'Draft saved.');
   switchPane('all-posts', document.querySelectorAll('.sidebar-item')[2]);
 }
 
-// ── Edit post ──────────────────────────────────────────
-function editPost(id) {
-  const posts = KFM.getPosts();
-  const post  = posts.find(p => p.id === id);
-  if (!post) return;
+function resetPostForm() {
+  ['np-title','np-subtitle','np-body','np-photo'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('np-tag').value = 'self-discovery';
+  document.getElementById('np-premium').value = 'no';
+  document.getElementById('np-edit-id').value = '';
+  document.getElementById('cancel-edit-btn').style.display = 'none';
+}
 
-  document.getElementById('np-title').value    = post.title;
-  document.getElementById('np-subtitle').value = post.subtitle || '';
-  document.getElementById('np-tag').value      = post.tag;
-  document.getElementById('np-body').value     = post.body;
-  document.getElementById('np-premium').value  = post.premium;
-  if (post.photo) {
-    const prev = document.getElementById('np-photo-preview');
-    prev.src = post.photo; prev.style.display = 'block';
-  }
-  // Remove original so saving replaces it
-  KFM.savePosts(posts.filter(p => p.id !== id));
-
+async function editPost(id) {
+  const { data } = await _sb.from('posts').select('*').eq('id',id).single();
+  if (!data) return;
+  document.getElementById('np-title').value    = data.title;
+  document.getElementById('np-subtitle').value = data.subtitle || '';
+  document.getElementById('np-tag').value      = data.tag;
+  document.getElementById('np-body').value     = data.body;
+  document.getElementById('np-premium').value  = data.premium;
+  document.getElementById('np-photo').value    = data.photo_url || '';
+  document.getElementById('np-edit-id').value  = data.id;
+  document.getElementById('cancel-edit-btn').style.display = 'inline-block';
   switchPane('new-post', document.querySelectorAll('.sidebar-item')[1]);
 }
 
-// ── Delete post ────────────────────────────────────────
-function deletePost(id) {
+function cancelEdit() { resetPostForm(); }
+
+async function deletePost(id) {
   if (!confirm('Delete this post?')) return;
-  KFM.savePosts(KFM.getPosts().filter(p => p.id !== id));
-  refreshData();
+  const { error } = await _sb.from('posts').delete().eq('id', id);
+  if (error) { showToast('Error deleting.'); return; }
   showToast('Post deleted.');
+  loadAllPosts();
 }
 
-// ── Photo preview ──────────────────────────────────────
-function previewImg(input, previewId) {
-  if (!input.files || !input.files[0]) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = document.getElementById(previewId);
-    img.src = e.target.result;
-    img.style.display = 'block';
-  };
-  reader.readAsDataURL(input.files[0]);
+// ── Subscribers ────────────────────────────────────────
+async function loadSubscribers() {
+  const { data: subs, count } = await _sb.from('subscribers').select('*', {count:'exact'}).order('created_at',{ascending:false});
+  const weekAgo = new Date(Date.now() - 7*86400000).toISOString();
+  const { count: weekCount } = await _sb.from('subscribers').select('*',{count:'exact',head:true}).gte('created_at', weekAgo);
+
+  setEl('subs-total', count || 0);
+  setEl('subs-week', weekCount || 0);
+
+  const tbody = document.getElementById('subs-tbody');
+  tbody.innerHTML = (subs||[]).map(s=>`<tr><td>${s.email}</td><td>${KFM.formatDate(s.created_at)}</td></tr>`).join('')
+    || '<tr><td colspan="2" style="color:var(--text-muted);padding:16px">No subscribers yet.</td></tr>';
 }
 
-// ── About settings ─────────────────────────────────────
-function saveAbout() {
-  const s = JSON.parse(localStorage.getItem('kfm_settings') || '{}');
-  s.bio_headline = document.getElementById('ab-headline').value.trim();
-  s.bio_quote    = document.getElementById('ab-quote').value.trim();
-  s.bio_text     = document.getElementById('ab-bio').value.trim();
-  const prev = document.getElementById('ab-photo-preview');
-  if (prev && prev.style.display === 'block') s.photo_about = prev.src;
-  localStorage.setItem('kfm_settings', JSON.stringify(s));
+// ── Settings (About) ───────────────────────────────────
+async function loadAboutForm() {
+  const { data } = await _sb.from('settings').select('*').eq('id',1).single();
+  if (!data) return;
+  setVal('ab-headline', data.bio_headline);
+  setVal('ab-quote',    data.bio_quote);
+  setVal('ab-bio',      data.bio_text);
+  setVal('ab-photo',    data.photo_about);
+}
+
+async function saveAbout() {
+  const { error } = await _sb.from('settings').update({
+    bio_headline: document.getElementById('ab-headline').value.trim(),
+    bio_quote:    document.getElementById('ab-quote').value.trim(),
+    bio_text:     document.getElementById('ab-bio').value.trim(),
+    photo_about:  document.getElementById('ab-photo').value.trim() || null,
+  }).eq('id',1);
+  if (error) { showToast('Error saving.'); return; }
   showToast('About page saved ✦');
 }
 
-// ── Site settings ──────────────────────────────────────
-function saveSettings() {
-  const s = JSON.parse(localStorage.getItem('kfm_settings') || '{}');
-  s.email   = document.getElementById('ss-email').value.trim();
-  s.address = document.getElementById('ss-address').value.trim();
-  s.tagline = document.getElementById('ss-tagline').value.trim();
-  localStorage.setItem('kfm_settings', JSON.stringify(s));
+// ── Settings (Site) ────────────────────────────────────
+async function loadSiteForm() {
+  const { data } = await _sb.from('settings').select('*').eq('id',1).single();
+  if (!data) return;
+  setVal('ss-email',   data.email);
+  setVal('ss-address', data.address);
+  setVal('ss-tagline', data.tagline);
+}
+
+async function saveSettings() {
+  const { error } = await _sb.from('settings').update({
+    email:   document.getElementById('ss-email').value.trim(),
+    address: document.getElementById('ss-address').value.trim(),
+    tagline: document.getElementById('ss-tagline').value.trim(),
+  }).eq('id',1);
+  if (error) { showToast('Error saving.'); return; }
   showToast('Settings saved.');
 }
 
-// ── Load saved settings into forms ────────────────────
-function loadSavedSettings() {
-  const s = JSON.parse(localStorage.getItem('kfm_settings') || '{}');
-  if (s.bio_headline) document.getElementById('ab-headline').value = s.bio_headline;
-  if (s.bio_quote)    document.getElementById('ab-quote').value    = s.bio_quote;
-  if (s.bio_text)     document.getElementById('ab-bio').value      = s.bio_text;
-  if (s.photo_about) {
-    const p = document.getElementById('ab-photo-preview');
-    p.src = s.photo_about; p.style.display = 'block';
-  }
-  if (s.email)   document.getElementById('ss-email').value   = s.email;
-  if (s.address) document.getElementById('ss-address').value = s.address;
-  if (s.tagline) document.getElementById('ss-tagline').value = s.tagline;
-}
+// ── Utilities ──────────────────────────────────────────
+function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function setVal(id, val) { const el = document.getElementById(id); if (el && val) el.value = val; }
 
 // ── Init ───────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  loadSavedSettings();
-  refreshData();
-});
+document.addEventListener('DOMContentLoaded', () => loadPane('overview'));
 </script>
 </body>
 </html>

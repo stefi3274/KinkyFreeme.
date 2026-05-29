@@ -131,6 +131,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script src="app.js"></script>
 <script>
   // Year
@@ -152,3 +154,21 @@
 </script>
 </body>
 </html>
+<script>
+// Override: load posts from Supabase
+(async () => {
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  const { data: posts } = await _sb.from('posts')
+    .select('*').eq('status','published').order('created_at',{ascending:false}).limit(3);
+  const grid = document.getElementById('home-posts');
+  grid.innerHTML = (posts && posts.length)
+    ? posts.map(buildCard).join('')
+    : '<p style="color:var(--text-muted);font-size:0.9rem">No posts yet — write your first story from the Admin panel.</p>';
+
+  const { data: s } = await _sb.from('settings').select('email,tagline').eq('id',1).single();
+  if (s && s.email) {
+    document.getElementById('footer-contact-li').style.display = 'block';
+    document.getElementById('footer-email-link').href = 'mailto:' + s.email;
+  }
+})();
+</script>

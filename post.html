@@ -40,6 +40,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script src="app.js"></script>
 <script>
   // Age gate
@@ -107,3 +109,53 @@
 </script>
 </body>
 </html>
+<script>
+(async () => {
+  const id   = parseInt(sessionStorage.getItem('kfm_read_id'));
+  const wrap = document.getElementById('post-wrap');
+  if (!id) { wrap.innerHTML = '<span class="post-back" onclick="history.back()">← Back</span><p style="color:var(--text-muted)">Post not found.</p>'; return; }
+
+  const { data: post } = await _sb.from('posts').select('*').eq('id',id).single();
+  if (!post) { wrap.innerHTML = '<span class="post-back" onclick="history.back()">← Back</span><p style="color:var(--text-muted)">Post not found.</p>'; return; }
+
+  const label     = KFM.tagLabel(post.tag);
+  const paras     = post.body.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('');
+  const isMember  = KFM.isSubscribed();
+  const isPremium = post.premium === 'yes';
+
+  const cover = post.photo_url
+    ? `<div class="post-cover"><img src="${post.photo_url}" alt="${post.title}"></div>`
+    : `<div class="post-cover"><div class="post-cover-placeholder">✦</div></div>`;
+
+  let bodyHtml;
+  if (isPremium && !isMember) {
+    const preview = post.body.split('\n').filter(l=>l.trim()).slice(0,2).map(l=>`<p>${l}</p>`).join('');
+    const rest    = post.body.split('\n').filter(l=>l.trim()).slice(2).map(l=>`<p>${l}</p>`).join('');
+    bodyHtml = `
+      <div class="post-body">${preview}</div>
+      <div class="post-body blur-zone">${rest}</div>
+      <div class="premium-gate">
+        <h3>This story is for members</h3>
+        <p>Subscribe (it's free) to unlock this piece and every premium story.</p>
+        <button class="btn btn-primary" onclick="document.getElementById('post-newsletter').style.display='block';document.getElementById('post-newsletter').scrollIntoView({behavior:'smooth'})">Join the Circle — Free</button>
+      </div>`;
+  } else {
+    bodyHtml = `<div class="post-body">${paras}</div>`;
+    document.getElementById('post-newsletter').style.display = 'block';
+  }
+
+  document.title = post.title + ' — Kinky, Free Me';
+  wrap.innerHTML = `
+    <span class="post-back" onclick="history.back()">← Back to Journal</span>
+    <div class="post-tag">${label}</div>
+    <h1 class="post-title">${post.title}</h1>
+    ${post.subtitle ? `<p class="post-subtitle">${post.subtitle}</p>` : ''}
+    <div class="post-meta">
+      <span>Gia Curls</span>
+      <span>${KFM.formatDate(post.created_at)}</span>
+      <span>${isPremium ? '✦ Members' : 'Free read'}</span>
+    </div>
+    ${cover}
+    ${bodyHtml}`;
+})();
+</script>

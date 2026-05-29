@@ -86,6 +86,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script src="app.js"></script>
 <script>
   // Age gate
@@ -124,3 +126,24 @@
 </script>
 </body>
 </html>
+<script>
+(async () => {
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  const { data: s } = await _sb.from('settings').select('*').eq('id',1).single();
+  if (!s) return;
+  if (s.bio_headline) document.getElementById('about-headline').textContent = s.bio_headline;
+  if (s.bio_quote)    document.getElementById('about-quote').textContent = '"' + s.bio_quote + '"';
+  if (s.bio_text) {
+    document.getElementById('about-bio').innerHTML = s.bio_text
+      .split('\n').filter(l=>l.trim()).map(l=>`<p style="font-size:0.95rem;line-height:1.8;color:var(--text-muted);margin-bottom:1em">${l}</p>`).join('');
+  }
+  if (s.photo_about) {
+    document.getElementById('about-photo-wrap').innerHTML = `<img src="${s.photo_about}" alt="Gia Curls" style="width:100%;height:100%;object-fit:cover">`;
+  }
+  if (s.email || s.address) {
+    document.getElementById('about-contact-block').style.display = 'block';
+    if (s.email)   document.getElementById('about-email-display').innerHTML = `<a href="mailto:${s.email}" style="color:var(--accent)">${s.email}</a>`;
+    if (s.address) document.getElementById('about-address-display').textContent = s.address;
+  }
+})();
+</script>
