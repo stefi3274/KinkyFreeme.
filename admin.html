@@ -78,7 +78,7 @@
 </div>
 
 <!-- ══ RESET PASSWORD SCREEN ══════════════════════════════ -->
-<div id="reset-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);align-items:center;justify-content:center;padding:32px">
+<div id="reset-screen" style="visibility:hidden;pointer-events:none;position:fixed;inset:0;z-index:9998;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:32px">
   <div class="login-box">
     <div class="logo">Kinky, <em>Free Me</em></div>
     <div class="sub">Create New Password</div>
@@ -449,7 +449,9 @@ async function doResetSave() {
   if (pw1 !== pw2) { err.textContent = 'Passwords do not match.'; err.style.display='block'; return; }
   const { error } = await _sb.auth.updateUser({ password: pw1 });
   if (error) { err.textContent = 'Error. Try again.'; err.style.display='block'; return; }
-  document.getElementById('reset-screen').style.display = 'none';
+  const rs = document.getElementById('reset-screen');
+  rs.style.visibility = 'hidden';
+  rs.style.pointerEvents = 'none';
   showToast('Password updated — please log in ✦');
   document.getElementById('login-screen').style.display = 'flex';
 }
@@ -463,7 +465,8 @@ async function checkSession() {
     if (session) {
       document.getElementById('login-screen').style.display = 'none';
       const rs = document.getElementById('reset-screen');
-      rs.style.display = 'flex';
+      rs.style.visibility = 'visible';
+      rs.style.pointerEvents = 'auto';
       return;
     }
   }
