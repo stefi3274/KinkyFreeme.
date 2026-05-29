@@ -613,7 +613,14 @@ function applySize(val) {
   document.getElementById('size-label').textContent = val+'px';
   localStorage.setItem('kfm_size', val);
 }
-function saveDesign() { showToast('Design saved ✦'); }
+async function saveDesign() {
+  const theme = localStorage.getItem('kfm_theme') || 'rose';
+  const font  = localStorage.getItem('kfm_font')  || 'cormorant';
+  const size  = localStorage.getItem('kfm_size')  || '16';
+  const { error } = await _sb.from('settings').update({ theme, font, font_size: size }).eq('id',1);
+  if (error) { showToast('Error saving design.'); return; }
+  showToast('Design saved — visible to all visitors ✦');
+}
 function loadDesignState() {
   const theme = localStorage.getItem('kfm_theme') || 'rose';
   const font  = localStorage.getItem('kfm_font')  || 'cormorant';
