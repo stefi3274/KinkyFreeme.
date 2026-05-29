@@ -169,8 +169,14 @@
           </select>
         </div>
         <div class="field">
-          <label>Cover Photo URL</label>
-          <input type="url" id="np-photo" placeholder="https://… (upload on imgbb.com, paste the link)">
+          <label>Cover Photo</label>
+          <div class="upload-zone" onclick="document.getElementById('np-photo-file').click()">
+            <span style="font-size:2rem">📷</span>
+            <p id="np-photo-label">Tap to choose a photo from your device</p>
+          </div>
+          <input type="file" id="np-photo-file" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'np-photo-label','np-photo-preview','np-photo-url')">
+          <img id="np-photo-preview" style="display:none;width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius);margin-top:10px">
+          <input type="hidden" id="np-photo-url">
         </div>
         <div class="field">
           <label>Body *</label>
@@ -228,8 +234,14 @@
       <div class="admin-card">
         <h3>Your photo</h3>
         <div class="field">
-          <label>Photo URL</label>
-          <input type="url" id="ab-photo" placeholder="https://… (upload on imgbb.com, paste the link)">
+          <label>Portrait Photo</label>
+          <div class="upload-zone" onclick="document.getElementById('ab-photo-file').click()">
+            <span style="font-size:2rem">🖼</span>
+            <p id="ab-photo-label">Tap to choose a photo from your device</p>
+          </div>
+          <input type="file" id="ab-photo-file" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'ab-photo-label','ab-photo-preview','ab-photo-url')">
+          <img id="ab-photo-preview" style="display:none;width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius);margin-top:10px">
+          <input type="hidden" id="ab-photo-url">
         </div>
       </div>
       <div class="admin-card">
@@ -469,7 +481,7 @@ async function savePost(status) {
     subtitle:  document.getElementById('np-subtitle').value.trim() || null,
     tag:       document.getElementById('np-tag').value,
     premium:   document.getElementById('np-premium').value,
-    photo_url: document.getElementById('np-photo').value.trim() || null,
+    photo_url: document.getElementById('np-photo-url').value || null,
     body, status
   };
   const editId = document.getElementById('np-edit-id').value;
@@ -483,10 +495,12 @@ async function savePost(status) {
 }
 
 function resetPostForm() {
-  ['np-title','np-subtitle','np-body','np-photo'].forEach(id => document.getElementById(id).value = '');
+  ['np-title','np-subtitle','np-body','np-photo-url'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('np-tag').value = 'self-discovery';
   document.getElementById('np-premium').value = 'no';
   document.getElementById('np-edit-id').value = '';
+  document.getElementById('np-photo-preview').style.display = 'none';
+  document.getElementById('np-photo-label').textContent = 'Tap to choose a photo from your device';
   document.getElementById('cancel-edit-btn').style.display = 'none';
 }
 
@@ -498,7 +512,12 @@ async function editPost(id) {
   document.getElementById('np-tag').value      = data.tag;
   document.getElementById('np-body').value     = data.body;
   document.getElementById('np-premium').value  = data.premium;
-  document.getElementById('np-photo').value    = data.photo_url || '';
+  document.getElementById('np-photo-url').value  = data.photo_url || '';
+  if (data.photo_url) {
+    const prev = document.getElementById('np-photo-preview');
+    prev.src = data.photo_url; prev.style.display = 'block';
+    document.getElementById('np-photo-label').textContent = 'Photo loaded — tap to change';
+  }
   document.getElementById('np-edit-id').value  = data.id;
   document.getElementById('cancel-edit-btn').style.display = 'inline-block';
   switchPane('new-post', document.querySelectorAll('.sidebar-item')[1]);
@@ -532,15 +551,21 @@ async function loadAboutForm() {
   setVal('ab-headline', data.bio_headline);
   setVal('ab-quote',    data.bio_quote);
   setVal('ab-bio',      data.bio_text);
-  setVal('ab-photo',    data.photo_about);
+  if (data.photo_about) {
+    document.getElementById('ab-photo-url').value = data.photo_about;
+    const prev = document.getElementById('ab-photo-preview');
+    prev.src = data.photo_about; prev.style.display = 'block';
+    document.getElementById('ab-photo-label').textContent = 'Photo loaded — tap to change';
+  }
 }
 
 async function saveAbout() {
+  const photoUrl = document.getElementById('ab-photo-url').value || null;
   const { error } = await _sb.from('settings').update({
     bio_headline: document.getElementById('ab-headline').value.trim(),
     bio_quote:    document.getElementById('ab-quote').value.trim(),
     bio_text:     document.getElementById('ab-bio').value.trim(),
-    photo_about:  document.getElementById('ab-photo').value.trim() || null,
+    photo_about:  photoUrl,
   }).eq('id',1);
   if (error) { showToast('Error saving.'); return; }
   showToast('About page saved ✦');
@@ -625,6 +650,35 @@ function savePassword() {
   document.getElementById('pw-new').value = '';
   document.getElementById('pw-confirm').value = '';
   showToast('Password saved ✦');
+}
+
+// ══ PHOTO UPLOAD → SUPABASE STORAGE ══════════════════════
+async function handlePhotoUpload(input, labelId, previewId, urlFieldId) {
+  const file = input.files[0];
+  if (!file) return;
+
+  document.getElementById(labelId).textContent = 'Uploading…';
+
+  const ext      = file.name.split('.').pop();
+  const filename = `${Date.now()}.${ext}`;
+  const path     = `uploads/${filename}`;
+
+  const { error } = await _sb.storage.from('media').upload(path, file, { upsert: true });
+  if (error) {
+    showToast('Upload failed. Check your Supabase Storage bucket.');
+    document.getElementById(labelId).textContent = 'Tap to choose a photo from your device';
+    console.error(error);
+    return;
+  }
+
+  const { data } = _sb.storage.from('media').getPublicUrl(path);
+  const url = data.publicUrl;
+
+  document.getElementById(urlFieldId).value = url;
+  const prev = document.getElementById(previewId);
+  prev.src = url; prev.style.display = 'block';
+  document.getElementById(labelId).textContent = '✓ Photo uploaded — tap to change';
+  showToast('Photo uploaded ✦');
 }
 
 // ══ UTILS ═════════════════════════════════════════════════
