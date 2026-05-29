@@ -5,20 +5,116 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Kinky, Free Me</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Login screen ── */
+    #login-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      padding: 32px;
+    }
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 48px 40px;
+      width: 100%; max-width: 380px;
+      text-align: center;
+    }
+    .login-box .logo {
+      font-family: var(--font-display);
+      font-size: 1.6rem; font-style: italic; font-weight: 300;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .login-box .logo em { color: var(--accent); }
+    .login-box .sub {
+      font-family: var(--font-label);
+      font-size: 0.62rem; letter-spacing: 0.26em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 32px;
+    }
+    .login-box input {
+      width: 100%; padding: 13px 16px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text);
+      font-family: var(--font-ui); font-size: 0.95rem;
+      outline: none; text-align: center;
+      letter-spacing: 0.12em; margin-bottom: 14px;
+      transition: border-color 0.2s;
+    }
+    .login-box input:focus { border-color: var(--accent); }
+    .login-box button {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: var(--radius);
+      font-family: var(--font-label); font-size: 0.72rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .login-box button:hover { opacity: 0.85; }
+    .login-error {
+      color: #c0392b; font-size: 0.82rem;
+      margin-top: 12px; display: none;
+    }
+    .login-hint {
+      font-size: 0.78rem; color: var(--text-muted);
+      margin-top: 16px; line-height: 1.5;
+    }
+    /* ── Design swatches ── */
+    .swatch-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .swatch {
+      width: 36px; height: 36px; border-radius: 50%;
+      cursor: pointer; border: 2px solid transparent;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .swatch:hover { transform: scale(1.12); }
+    .swatch.active { border-color: var(--accent); }
+    .swatch-rose  { background: linear-gradient(135deg,#fdf8f5,#b05470); }
+    .swatch-noir  { background: linear-gradient(135deg,#111,#d4af6e); }
+    .swatch-blush { background: linear-gradient(135deg,#fff0f3,#e07090); }
+    .swatch-sage  { background: linear-gradient(135deg,#f4f7f4,#5a8a6a); }
+    .font-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .font-pill {
+      padding: 8px 16px; border: 1px solid var(--border);
+      border-radius: 20px; font-size: 0.85rem;
+      color: var(--text-muted); cursor: pointer;
+      background: var(--bg2); transition: all 0.15s;
+    }
+    .font-pill:hover { border-color: var(--accent); color: var(--text); }
+    .font-pill.active { border-color: var(--accent); color: var(--accent); background: var(--bg3); }
+  </style>
 </head>
 <body>
 
 <div id="toast"></div>
 
+<!-- ══ LOGIN SCREEN ══════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="logo">Kinky, <em>Free Me</em></div>
+    <div class="sub">Admin Access</div>
+    <input type="password" id="pw-input" placeholder="Enter your password" onkeydown="if(event.key==='Enter')checkLogin()">
+    <button onclick="checkLogin()">Enter</button>
+    <div class="login-error" id="login-error">Incorrect password. Try again.</div>
+    <p class="login-hint" id="login-hint" style="display:none">
+      First time here? Go to <strong>Settings → Security</strong> to create your password.
+    </p>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL ════════════════════════════════════════ -->
+<div id="admin-panel" style="display:none">
+
 <nav class="site-nav" style="background:var(--bg2)">
   <a href="index.html" class="nav-logo">Kinky, <em>Free Me</em></a>
   <span style="font-family:var(--font-label);font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);margin-right:auto;padding-left:16px">Admin</span>
   <a href="index.html" class="nav-link">← View Site</a>
+  <button onclick="logout()" style="background:none;border:none;font-size:0.72rem;font-family:var(--font-label);letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;margin-left:16px">Log out</button>
 </nav>
 
 <div class="admin-layout">
   <aside class="admin-sidebar">
-    <div class="sidebar-label">Dashboard</div>
+    <div class="sidebar-label">Content</div>
     <div class="sidebar-item active" onclick="switchPane('overview',this)">📊 Overview</div>
     <div class="sidebar-item" onclick="switchPane('new-post',this)">✍️ New Post</div>
     <div class="sidebar-item" onclick="switchPane('all-posts',this)">📝 All Posts</div>
@@ -26,6 +122,8 @@
     <div class="sidebar-label" style="margin-top:28px">Settings</div>
     <div class="sidebar-item" onclick="switchPane('about-settings',this)">👤 About Page</div>
     <div class="sidebar-item" onclick="switchPane('site-settings',this)">⚙️ Site Info</div>
+    <div class="sidebar-item" onclick="switchPane('design-settings',this)">🎨 Design</div>
+    <div class="sidebar-item" onclick="switchPane('security',this)">🔒 Security</div>
   </aside>
 
   <div class="admin-content">
@@ -72,12 +170,11 @@
         </div>
         <div class="field">
           <label>Cover Photo URL</label>
-          <input type="url" id="np-photo" placeholder="https://… (paste an image URL)">
-          <small style="color:var(--text-muted);font-size:0.78rem;margin-top:4px">Upload your image to imgbb.com or similar, then paste the link here.</small>
+          <input type="url" id="np-photo" placeholder="https://… (upload on imgbb.com, paste the link)">
         </div>
         <div class="field">
           <label>Body *</label>
-          <textarea id="np-body" placeholder="Write your story here. Each new line becomes a new paragraph." style="min-height:220px"></textarea>
+          <textarea id="np-body" placeholder="Write your story here. Each new line becomes a new paragraph." style="min-height:240px"></textarea>
         </div>
         <div class="field">
           <label>Access</label>
@@ -119,7 +216,7 @@
         <h3>Subscriber list</h3>
         <table class="data-table">
           <thead><tr><th>Email</th><th>Date</th></tr></thead>
-          <tbody id="subs-tbody"><tr><td colspan="2" style="color:var(--text-muted)">Loading…</td></tr></tbody>
+          <tbody id="subs-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -132,8 +229,7 @@
         <h3>Your photo</h3>
         <div class="field">
           <label>Photo URL</label>
-          <input type="url" id="ab-photo" placeholder="https://… (paste your portrait image URL)">
-          <small style="color:var(--text-muted);font-size:0.78rem;margin-top:4px">Upload to imgbb.com then paste the link.</small>
+          <input type="url" id="ab-photo" placeholder="https://… (upload on imgbb.com, paste the link)">
         </div>
       </div>
       <div class="admin-card">
@@ -161,7 +257,6 @@
       <div class="pane-title">Site Info</div>
       <div class="pane-sub">Contact details and footer information.</div>
       <div class="admin-card">
-        <h3>Contact</h3>
         <div class="field">
           <label>Email address (public)</label>
           <input type="email" id="ss-email" placeholder="e.g. gia@kinkyfreeme.com">
@@ -180,21 +275,139 @@
       </div>
     </div>
 
-  </div>
-</div>
+    <!-- Design Settings -->
+    <div id="pane-design-settings" class="admin-pane">
+      <div class="pane-title">Design</div>
+      <div class="pane-sub">Customize the look of your blog. Changes apply instantly.</div>
 
-<!-- Footer credit -->
-<footer style="text-align:center;padding:20px;border-top:1px solid var(--border);background:var(--bg2)">
-  <span style="font-size:0.72rem;color:var(--text-muted);font-family:var(--font-label);letter-spacing:0.12em">
-    Created by <a href="#" style="color:var(--accent)">SteFi Services</a>
+      <div class="admin-card">
+        <h3>🎨 Color Theme</h3>
+        <div class="field">
+          <label>Choose a palette</label>
+          <div class="swatch-row">
+            <div class="swatch swatch-rose active" data-theme="rose" onclick="applyTheme('rose',this)" title="Rose Ivory"></div>
+            <div class="swatch swatch-noir" data-theme="noir" onclick="applyTheme('noir',this)" title="Noir Gold"></div>
+            <div class="swatch swatch-blush" data-theme="blush" onclick="applyTheme('blush',this)" title="Full Blush"></div>
+            <div class="swatch swatch-sage" data-theme="sage" onclick="applyTheme('sage',this)" title="Sage"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h3>🔤 Typography</h3>
+        <div class="field">
+          <label>Heading font</label>
+          <div class="font-row">
+            <div class="font-pill active" data-font="cormorant" onclick="applyFont('cormorant',this)" style="font-family:'Cormorant Garamond',serif">Cormorant</div>
+            <div class="font-pill" data-font="playfair" onclick="applyFont('playfair',this)" style="font-family:'Playfair Display',serif">Playfair</div>
+            <div class="font-pill" data-font="garamond" onclick="applyFont('garamond',this)" style="font-family:'EB Garamond',serif">Garamond</div>
+            <div class="font-pill" data-font="josefin" onclick="applyFont('josefin',this)" style="font-family:'Josefin Sans',sans-serif">Josefin</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h3>📐 Text size</h3>
+        <div class="field">
+          <label>Body text size — <span id="size-label">16px</span></label>
+          <input type="range" min="14" max="20" value="16" id="size-slider" oninput="applySize(this.value)"
+            style="width:100%;accent-color:var(--accent);margin-top:8px">
+        </div>
+      </div>
+
+      <div style="padding:0 4px">
+        <button class="btn-save" onclick="saveDesign()">Save Design</button>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div id="pane-security" class="admin-pane">
+      <div class="pane-title">Security</div>
+      <div class="pane-sub">Create or change your admin password.</div>
+      <div class="admin-card">
+        <h3>Admin password</h3>
+        <div class="field">
+          <label>New password</label>
+          <input type="password" id="pw-new" placeholder="Choose a password…">
+        </div>
+        <div class="field">
+          <label>Confirm password</label>
+          <input type="password" id="pw-confirm" placeholder="Repeat your password…">
+        </div>
+        <div class="row-actions">
+          <button class="btn-save" onclick="savePassword()">Save Password</button>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin-top:16px;line-height:1.6">
+          Your password is stored securely in your browser. If you change devices, you'll need to set it again.
+        </p>
+      </div>
+    </div>
+
+  </div><!-- /admin-content -->
+</div><!-- /admin-layout -->
+
+<footer style="text-align:center;padding:18px;border-top:1px solid var(--border);background:var(--bg2)">
+  <span style="font-size:0.65rem;color:var(--text-muted);font-family:var(--font-label);letter-spacing:0.14em;text-transform:uppercase">
+    Created by <a href="mailto:mervilstevenson@gmail.com" style="color:var(--accent)">SteFi Services</a>
   </span>
 </footer>
+
+</div><!-- /admin-panel -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script>
-// ── Pane switching ─────────────────────────────────────
+
+// ══ THEME DEFINITIONS ════════════════════════════════════
+const THEMES = {
+  rose:  { '--bg':'#fdf8f5','--bg2':'#f7f0ea','--bg3':'#f0e6dd','--surface':'#ffffff','--accent':'#b05470','--accent2':'#d4849a','--accent-lt':'#f4dde4','--text':'#2a1a22','--text-mid':'#6a4a56','--text-muted':'#a07888','--border':'rgba(176,84,112,0.14)','--shadow':'rgba(176,84,112,0.08)','--glow':'rgba(176,84,112,0.10)' },
+  noir:  { '--bg':'#0d0d0d','--bg2':'#141414','--bg3':'#1a1a1a','--surface':'#1f1f1f','--accent':'#d4af6e','--accent2':'#e8cfa0','--accent-lt':'#2a2318','--text':'#f0ead8','--text-mid':'#b8a880','--text-muted':'#7a6a50','--border':'rgba(212,175,110,0.15)','--shadow':'rgba(212,175,110,0.08)','--glow':'rgba(212,175,110,0.08)' },
+  blush: { '--bg':'#fff3f5','--bg2':'#ffe8ed','--bg3':'#ffd8e0','--surface':'#ffffff','--accent':'#d45070','--accent2':'#e890a8','--accent-lt':'#fde0e8','--text':'#3a1020','--text-mid':'#7a3048','--text-muted':'#b07088','--border':'rgba(212,80,112,0.15)','--shadow':'rgba(212,80,112,0.08)','--glow':'rgba(212,80,112,0.08)' },
+  sage:  { '--bg':'#f5f7f5','--bg2':'#eaf0ea','--bg3':'#dde8dd','--surface':'#ffffff','--accent':'#5a8a6a','--accent2':'#88b898','--accent-lt':'#ddeedd','--text':'#1a2a1a','--text-mid':'#3a5a3a','--text-muted':'#7a9a7a','--border':'rgba(90,138,106,0.15)','--shadow':'rgba(90,138,106,0.08)','--glow':'rgba(90,138,106,0.08)' }
+};
+
+const FONTS = {
+  cormorant: "'Cormorant Garamond', serif",
+  playfair:  "'Playfair Display', serif",
+  garamond:  "'EB Garamond', serif",
+  josefin:   "'Josefin Sans', sans-serif"
+};
+
+// ══ LOGIN ═════════════════════════════════════════════════
+function checkLogin() {
+  const stored = localStorage.getItem('kfm_admin_pw');
+  const input  = document.getElementById('pw-input').value;
+
+  // No password set yet — let her in and prompt to create one
+  if (!stored) {
+    openAdmin();
+    document.getElementById('login-hint').style.display = 'block';
+    return;
+  }
+  if (input === stored) {
+    openAdmin();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+  }
+}
+
+function openAdmin() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-panel').style.display  = 'block';
+  loadPane('overview');
+  loadDesignState();
+}
+
+function logout() {
+  document.getElementById('admin-panel').style.display  = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('login-error').style.display  = 'none';
+}
+
+// ══ PANE SWITCHING ════════════════════════════════════════
 function switchPane(name, el) {
   document.querySelectorAll('.admin-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
@@ -204,26 +417,24 @@ function switchPane(name, el) {
 }
 
 async function loadPane(name) {
-  if (name === 'overview')      await loadOverview();
-  if (name === 'all-posts')     await loadAllPosts();
-  if (name === 'subscribers')   await loadSubscribers();
-  if (name === 'about-settings')await loadAboutForm();
-  if (name === 'site-settings') await loadSiteForm();
+  if (name === 'overview')        await loadOverview();
+  if (name === 'all-posts')       await loadAllPosts();
+  if (name === 'subscribers')     await loadSubscribers();
+  if (name === 'about-settings')  await loadAboutForm();
+  if (name === 'site-settings')   await loadSiteForm();
+  if (name === 'design-settings') loadDesignState();
 }
 
-// ── Overview ───────────────────────────────────────────
+// ══ OVERVIEW ══════════════════════════════════════════════
 async function loadOverview() {
   const { data: posts } = await _sb.from('posts').select('id,title,tag,status,created_at').order('created_at',{ascending:false});
   const { count: subCount } = await _sb.from('subscribers').select('*',{count:'exact',head:true});
-
-  const pub   = (posts||[]).filter(p=>p.status==='published').length;
-  const drfs  = (posts||[]).filter(p=>p.status==='draft').length;
+  const pub  = (posts||[]).filter(p=>p.status==='published').length;
+  const drfs = (posts||[]).filter(p=>p.status==='draft').length;
   setEl('ov-published', pub);
   setEl('ov-drafts', drfs);
-  setEl('ov-subs', subCount || 0);
-
-  const tbody = document.getElementById('ov-recent');
-  tbody.innerHTML = (posts||[]).slice(0,6).map(p=>`
+  setEl('ov-subs', subCount||0);
+  document.getElementById('ov-recent').innerHTML = (posts||[]).slice(0,6).map(p=>`
     <tr>
       <td>${p.title}</td>
       <td>${KFM.tagLabel(p.tag)}</td>
@@ -232,11 +443,10 @@ async function loadOverview() {
     </tr>`).join('') || '<tr><td colspan="4" style="color:var(--text-muted)">No posts yet.</td></tr>';
 }
 
-// ── All posts ──────────────────────────────────────────
+// ══ ALL POSTS ═════════════════════════════════════════════
 async function loadAllPosts() {
   const { data: posts } = await _sb.from('posts').select('*').order('created_at',{ascending:false});
-  const tbody = document.getElementById('posts-tbody');
-  tbody.innerHTML = (posts||[]).map(p=>`
+  document.getElementById('posts-tbody').innerHTML = (posts||[]).map(p=>`
     <tr>
       <td>${p.title}</td>
       <td>${KFM.tagLabel(p.tag)}</td>
@@ -250,31 +460,23 @@ async function loadAllPosts() {
     </tr>`).join('') || '<tr><td colspan="6" style="color:var(--text-muted);padding:16px">No posts yet.</td></tr>';
 }
 
-// ── Save post (create or update) ───────────────────────
 async function savePost(status) {
-  const title   = document.getElementById('np-title').value.trim();
-  const body    = document.getElementById('np-body').value.trim();
+  const title = document.getElementById('np-title').value.trim();
+  const body  = document.getElementById('np-body').value.trim();
   if (!title || !body) { showToast('Title and body are required.'); return; }
-
   const payload = {
     title,
-    subtitle: document.getElementById('np-subtitle').value.trim() || null,
-    tag:      document.getElementById('np-tag').value,
-    premium:  document.getElementById('np-premium').value,
-    photo_url:document.getElementById('np-photo').value.trim() || null,
+    subtitle:  document.getElementById('np-subtitle').value.trim() || null,
+    tag:       document.getElementById('np-tag').value,
+    premium:   document.getElementById('np-premium').value,
+    photo_url: document.getElementById('np-photo').value.trim() || null,
     body, status
   };
-
   const editId = document.getElementById('np-edit-id').value;
-  let error;
-  if (editId) {
-    ({ error } = await _sb.from('posts').update(payload).eq('id', editId));
-  } else {
-    ({ error } = await _sb.from('posts').insert(payload));
-  }
-
-  if (error) { showToast('Error saving post.'); console.error(error); return; }
-
+  const { error } = editId
+    ? await _sb.from('posts').update(payload).eq('id', editId)
+    : await _sb.from('posts').insert(payload);
+  if (error) { showToast('Error saving post.'); return; }
   resetPostForm();
   showToast(status === 'published' ? 'Post published! ✦' : 'Draft saved.');
   switchPane('all-posts', document.querySelectorAll('.sidebar-item')[2]);
@@ -312,21 +514,18 @@ async function deletePost(id) {
   loadAllPosts();
 }
 
-// ── Subscribers ────────────────────────────────────────
+// ══ SUBSCRIBERS ═══════════════════════════════════════════
 async function loadSubscribers() {
-  const { data: subs, count } = await _sb.from('subscribers').select('*', {count:'exact'}).order('created_at',{ascending:false});
-  const weekAgo = new Date(Date.now() - 7*86400000).toISOString();
-  const { count: weekCount } = await _sb.from('subscribers').select('*',{count:'exact',head:true}).gte('created_at', weekAgo);
-
-  setEl('subs-total', count || 0);
-  setEl('subs-week', weekCount || 0);
-
-  const tbody = document.getElementById('subs-tbody');
-  tbody.innerHTML = (subs||[]).map(s=>`<tr><td>${s.email}</td><td>${KFM.formatDate(s.created_at)}</td></tr>`).join('')
+  const { data: subs, count } = await _sb.from('subscribers').select('*',{count:'exact'}).order('created_at',{ascending:false});
+  const weekAgo = new Date(Date.now()-7*86400000).toISOString();
+  const { count: wk } = await _sb.from('subscribers').select('*',{count:'exact',head:true}).gte('created_at',weekAgo);
+  setEl('subs-total', count||0);
+  setEl('subs-week', wk||0);
+  document.getElementById('subs-tbody').innerHTML = (subs||[]).map(s=>`<tr><td>${s.email}</td><td>${KFM.formatDate(s.created_at)}</td></tr>`).join('')
     || '<tr><td colspan="2" style="color:var(--text-muted);padding:16px">No subscribers yet.</td></tr>';
 }
 
-// ── Settings (About) ───────────────────────────────────
+// ══ ABOUT ═════════════════════════════════════════════════
 async function loadAboutForm() {
   const { data } = await _sb.from('settings').select('*').eq('id',1).single();
   if (!data) return;
@@ -347,7 +546,7 @@ async function saveAbout() {
   showToast('About page saved ✦');
 }
 
-// ── Settings (Site) ────────────────────────────────────
+// ══ SITE INFO ═════════════════════════════════════════════
 async function loadSiteForm() {
   const { data } = await _sb.from('settings').select('*').eq('id',1).single();
   if (!data) return;
@@ -366,12 +565,72 @@ async function saveSettings() {
   showToast('Settings saved.');
 }
 
-// ── Utilities ──────────────────────────────────────────
-function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
-function setVal(id, val) { const el = document.getElementById(id); if (el && val) el.value = val; }
+// ══ DESIGN ════════════════════════════════════════════════
+function applyTheme(name, el) {
+  const vars = THEMES[name];
+  if (!vars) return;
+  Object.entries(vars).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  localStorage.setItem('kfm_theme', name);
+}
 
-// ── Init ───────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => loadPane('overview'));
+function applyFont(name, el) {
+  document.documentElement.style.setProperty('--font-display', FONTS[name]);
+  document.querySelectorAll('.font-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  localStorage.setItem('kfm_font', name);
+}
+
+function applySize(val) {
+  document.documentElement.style.setProperty('--font-size-base', val + 'px');
+  document.getElementById('size-label').textContent = val + 'px';
+  localStorage.setItem('kfm_size', val);
+}
+
+function saveDesign() {
+  // Already saved to localStorage in each apply function
+  showToast('Design saved ✦');
+}
+
+function loadDesignState() {
+  const theme = localStorage.getItem('kfm_theme') || 'rose';
+  const font  = localStorage.getItem('kfm_font')  || 'cormorant';
+  const size  = localStorage.getItem('kfm_size')  || '16';
+
+  // Apply theme
+  if (THEMES[theme]) Object.entries(THEMES[theme]).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
+  document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s.dataset.theme === theme));
+
+  // Apply font
+  if (FONTS[font]) document.documentElement.style.setProperty('--font-display', FONTS[font]);
+  document.querySelectorAll('.font-pill').forEach(p => p.classList.toggle('active', p.dataset.font === font));
+
+  // Apply size
+  document.documentElement.style.setProperty('--font-size-base', size + 'px');
+  const slider = document.getElementById('size-slider');
+  const label  = document.getElementById('size-label');
+  if (slider) slider.value = size;
+  if (label)  label.textContent = size + 'px';
+}
+
+// ══ PASSWORD ══════════════════════════════════════════════
+function savePassword() {
+  const pw1 = document.getElementById('pw-new').value;
+  const pw2 = document.getElementById('pw-confirm').value;
+  if (!pw1) { showToast('Please enter a password.'); return; }
+  if (pw1 !== pw2) { showToast('Passwords do not match.'); return; }
+  if (pw1.length < 6) { showToast('Password must be at least 6 characters.'); return; }
+  localStorage.setItem('kfm_admin_pw', pw1);
+  document.getElementById('pw-new').value = '';
+  document.getElementById('pw-confirm').value = '';
+  showToast('Password saved ✦');
+}
+
+// ══ UTILS ═════════════════════════════════════════════════
+function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function setVal(id, val) { const el = document.getElementById(id); if (el && val != null) el.value = val; }
+
 </script>
 </body>
 </html>
