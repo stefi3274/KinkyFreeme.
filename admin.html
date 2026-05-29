@@ -6,67 +6,29 @@
   <title>Admin — Kinky, Free Me</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ── Login screen ── */
+    /* ── Login ── */
     #login-screen {
       position: fixed; inset: 0; z-index: 9999;
       background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
-      padding: 32px;
+      display: flex; align-items: center; justify-content: center; padding: 32px;
     }
     .login-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 48px 40px;
-      width: 100%; max-width: 380px;
-      text-align: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 48px 40px;
+      width: 100%; max-width: 380px; text-align: center;
     }
-    .login-box .logo {
-      font-family: var(--font-display);
-      font-size: 1.6rem; font-style: italic; font-weight: 300;
-      color: var(--text); margin-bottom: 6px;
-    }
+    .login-box .logo { font-family: var(--font-display); font-size: 1.6rem; font-style: italic; font-weight: 300; color: var(--text); margin-bottom: 6px; }
     .login-box .logo em { color: var(--accent); }
-    .login-box .sub {
-      font-family: var(--font-label);
-      font-size: 0.62rem; letter-spacing: 0.26em;
-      text-transform: uppercase; color: var(--accent);
-      margin-bottom: 32px;
-    }
-    .login-box input {
-      width: 100%; padding: 13px 16px;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: var(--radius); color: var(--text);
-      font-family: var(--font-ui); font-size: 0.95rem;
-      outline: none; text-align: center;
-      letter-spacing: 0.12em; margin-bottom: 14px;
-      transition: border-color 0.2s;
-    }
+    .login-box .sub { font-family: var(--font-label); font-size: 0.62rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--accent); margin-bottom: 32px; }
+    .login-box input { width: 100%; padding: 13px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-ui); font-size: 0.95rem; outline: none; margin-bottom: 12px; transition: border-color 0.2s; }
     .login-box input:focus { border-color: var(--accent); }
-    .login-box button {
-      width: 100%; padding: 13px;
-      background: var(--accent); color: #fff;
-      border: none; border-radius: var(--radius);
-      font-family: var(--font-label); font-size: 0.72rem;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      cursor: pointer; transition: opacity 0.2s;
-    }
+    .login-box button { width: 100%; padding: 13px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-family: var(--font-label); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
     .login-box button:hover { opacity: 0.85; }
-    .login-error {
-      color: #c0392b; font-size: 0.82rem;
-      margin-top: 12px; display: none;
-    }
-    .login-hint {
-      font-size: 0.78rem; color: var(--text-muted);
-      margin-top: 16px; line-height: 1.5;
-    }
-    /* ── Design swatches ── */
+    .login-error { color: #c0392b; font-size: 0.82rem; margin-top: 12px; display: none; }
+    .login-forgot { font-size: 0.78rem; color: var(--accent); margin-top: 14px; cursor: pointer; display: block; }
+    /* ── Design ── */
     .swatch-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-    .swatch {
-      width: 36px; height: 36px; border-radius: 50%;
-      cursor: pointer; border: 2px solid transparent;
-      transition: transform 0.15s, border-color 0.15s;
-    }
+    .swatch { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.15s, border-color 0.15s; }
     .swatch:hover { transform: scale(1.12); }
     .swatch.active { border-color: var(--accent); }
     .swatch-rose  { background: linear-gradient(135deg,#fdf8f5,#b05470); }
@@ -74,42 +36,52 @@
     .swatch-blush { background: linear-gradient(135deg,#fff0f3,#e07090); }
     .swatch-sage  { background: linear-gradient(135deg,#f4f7f4,#5a8a6a); }
     .font-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-    .font-pill {
-      padding: 8px 16px; border: 1px solid var(--border);
-      border-radius: 20px; font-size: 0.85rem;
-      color: var(--text-muted); cursor: pointer;
-      background: var(--bg2); transition: all 0.15s;
-    }
+    .font-pill { padding: 8px 16px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; background: var(--bg2); transition: all 0.15s; }
     .font-pill:hover { border-color: var(--accent); color: var(--text); }
     .font-pill.active { border-color: var(--accent); color: var(--accent); background: var(--bg3); }
+    /* ── Photo upload ── */
+    .photo-upload-btn {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px; border: 2px dashed var(--border);
+      border-radius: var(--radius); cursor: pointer;
+      background: var(--bg2); transition: border-color 0.2s;
+      margin-bottom: 12px;
+    }
+    .photo-upload-btn:hover { border-color: var(--accent); }
+    .photo-upload-btn span { font-size: 1.6rem; }
+    .photo-upload-btn p { font-size: 0.86rem; color: var(--text-muted); margin: 0; }
+    .photo-upload-btn p strong { color: var(--text); display: block; font-size: 0.78rem; }
+    .photo-thumb { width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius); display: none; border: 1px solid var(--border); }
   </style>
 </head>
 <body>
 
 <div id="toast"></div>
 
-<!-- ══ LOGIN SCREEN ══════════════════════════════════════ -->
+<!-- ══ LOGIN ══════════════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-box">
     <div class="logo">Kinky, <em>Free Me</em></div>
     <div class="sub">Admin Access</div>
-    <input type="password" id="pw-input" placeholder="Enter your password" onkeydown="if(event.key==='Enter')checkLogin()">
-    <button onclick="checkLogin()">Enter</button>
-    <div class="login-error" id="login-error">Incorrect password. Try again.</div>
-    <p class="login-hint" id="login-hint" style="display:none">
-      First time here? Go to <strong>Settings → Security</strong> to create your password.
-    </p>
+    <input type="email" id="login-email" placeholder="kinkyfreeme@gmail.com" value="kinkyfreeme@gmail.com">
+    <input type="password" id="login-pw" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Enter</button>
+    <div class="login-error" id="login-error">Incorrect email or password.</div>
+    <span class="login-forgot" onclick="doReset()">Forgot your password?</span>
+    <div id="reset-msg" style="display:none;font-size:0.8rem;color:var(--accent);margin-top:12px;line-height:1.5">
+      A reset link has been sent to your email.
+    </div>
   </div>
 </div>
 
-<!-- ══ ADMIN PANEL ════════════════════════════════════════ -->
+<!-- ══ ADMIN ═══════════════════════════════════════════════ -->
 <div id="admin-panel" style="display:none">
 
 <nav class="site-nav" style="background:var(--bg2)">
   <a href="index.html" class="nav-logo">Kinky, <em>Free Me</em></a>
   <span style="font-family:var(--font-label);font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);margin-right:auto;padding-left:16px">Admin</span>
   <a href="index.html" class="nav-link">← View Site</a>
-  <button onclick="logout()" style="background:none;border:none;font-size:0.72rem;font-family:var(--font-label);letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;margin-left:16px">Log out</button>
+  <button onclick="doLogout()" style="background:none;border:none;font-size:0.72rem;font-family:var(--font-label);letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;margin-left:16px">Log out</button>
 </nav>
 
 <div class="admin-layout">
@@ -133,7 +105,7 @@
       <div class="pane-title">Welcome back, Gia ✦</div>
       <div class="pane-sub">Here's what's happening on Kinky, Free Me.</div>
       <div class="stats-row">
-        <div class="stat-box"><div class="stat-num" id="ov-published">—</div><div class="stat-lbl">Published posts</div></div>
+        <div class="stat-box"><div class="stat-num" id="ov-published">—</div><div class="stat-lbl">Published</div></div>
         <div class="stat-box"><div class="stat-num" id="ov-drafts">—</div><div class="stat-lbl">Drafts</div></div>
         <div class="stat-box"><div class="stat-num" id="ov-subs">—</div><div class="stat-lbl">Subscribers</div></div>
       </div>
@@ -149,7 +121,7 @@
     <!-- New Post -->
     <div id="pane-new-post" class="admin-pane">
       <div class="pane-title">New Post</div>
-      <div class="pane-sub">Write a new story and publish it — or save it as a draft.</div>
+      <div class="pane-sub">Write a new story — publish it or save as draft.</div>
       <div class="admin-card">
         <input type="hidden" id="np-edit-id">
         <div class="field">
@@ -168,16 +140,19 @@
             <option value="bdsm">BDSM</option>
           </select>
         </div>
+
+        <!-- Cover photo upload -->
         <div class="field">
           <label>Cover Photo</label>
-          <div class="upload-zone" onclick="document.getElementById('np-photo-file').click()">
-            <span style="font-size:2rem">📷</span>
-            <p id="np-photo-label">Tap to choose a photo from your device</p>
+          <div class="photo-upload-btn" onclick="document.getElementById('np-file').click()">
+            <span>📷</span>
+            <p><strong id="np-photo-label">Choose from your phone</strong>Tap here to open your gallery</p>
           </div>
-          <input type="file" id="np-photo-file" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'np-photo-label','np-photo-preview','np-photo-url')">
-          <img id="np-photo-preview" style="display:none;width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius);margin-top:10px">
+          <input type="file" id="np-file" accept="image/*" style="display:none" onchange="uploadPhoto(this,'np-photo-label','np-thumb','np-photo-url')">
+          <img id="np-thumb" class="photo-thumb">
           <input type="hidden" id="np-photo-url">
         </div>
+
         <div class="field">
           <label>Body *</label>
           <textarea id="np-body" placeholder="Write your story here. Each new line becomes a new paragraph." style="min-height:240px"></textarea>
@@ -192,7 +167,7 @@
         <div class="row-actions" style="margin-top:8px">
           <button class="btn-save" onclick="savePost('published')">Publish Now</button>
           <button class="btn-outline" onclick="savePost('draft')">Save as Draft</button>
-          <button class="btn-outline" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none">Cancel Edit</button>
+          <button class="btn-outline" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none">Cancel</button>
         </div>
       </div>
     </div>
@@ -227,25 +202,24 @@
       </div>
     </div>
 
-    <!-- About Settings -->
+    <!-- About Page -->
     <div id="pane-about-settings" class="admin-pane">
       <div class="pane-title">About Page</div>
-      <div class="pane-sub">Everything here will appear on your public About page.</div>
+      <div class="pane-sub">Your portrait and biography — visible on the public About page.</div>
+
       <div class="admin-card">
-        <h3>Your photo</h3>
-        <div class="field">
-          <label>Portrait Photo</label>
-          <div class="upload-zone" onclick="document.getElementById('ab-photo-file').click()">
-            <span style="font-size:2rem">🖼</span>
-            <p id="ab-photo-label">Tap to choose a photo from your device</p>
-          </div>
-          <input type="file" id="ab-photo-file" accept="image/*" style="display:none" onchange="handlePhotoUpload(this,'ab-photo-label','ab-photo-preview','ab-photo-url')">
-          <img id="ab-photo-preview" style="display:none;width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius);margin-top:10px">
-          <input type="hidden" id="ab-photo-url">
+        <h3>🖼 Profile Photo</h3>
+        <div class="photo-upload-btn" onclick="document.getElementById('ab-file').click()">
+          <span>📷</span>
+          <p><strong id="ab-photo-label">Choose from your phone</strong>Tap here to open your gallery</p>
         </div>
+        <input type="file" id="ab-file" accept="image/*" style="display:none" onchange="uploadPhoto(this,'ab-photo-label','ab-thumb','ab-photo-url')">
+        <img id="ab-thumb" class="photo-thumb">
+        <input type="hidden" id="ab-photo-url">
       </div>
+
       <div class="admin-card">
-        <h3>Your words</h3>
+        <h3>✍️ Your Words</h3>
         <div class="field">
           <label>Main headline</label>
           <input type="text" id="ab-headline" placeholder="e.g. I write because the silence was too heavy.">
@@ -264,7 +238,7 @@
       </div>
     </div>
 
-    <!-- Site Settings -->
+    <!-- Site Info -->
     <div id="pane-site-settings" class="admin-pane">
       <div class="pane-title">Site Info</div>
       <div class="pane-sub">Contact details and footer information.</div>
@@ -287,11 +261,10 @@
       </div>
     </div>
 
-    <!-- Design Settings -->
+    <!-- Design -->
     <div id="pane-design-settings" class="admin-pane">
       <div class="pane-title">Design</div>
-      <div class="pane-sub">Customize the look of your blog. Changes apply instantly.</div>
-
+      <div class="pane-sub">Customize the look of your blog.</div>
       <div class="admin-card">
         <h3>🎨 Color Theme</h3>
         <div class="field">
@@ -304,7 +277,6 @@
           </div>
         </div>
       </div>
-
       <div class="admin-card">
         <h3>🔤 Typography</h3>
         <div class="field">
@@ -317,16 +289,13 @@
           </div>
         </div>
       </div>
-
       <div class="admin-card">
-        <h3>📐 Text size</h3>
+        <h3>📐 Text Size</h3>
         <div class="field">
-          <label>Body text size — <span id="size-label">16px</span></label>
-          <input type="range" min="14" max="20" value="16" id="size-slider" oninput="applySize(this.value)"
-            style="width:100%;accent-color:var(--accent);margin-top:8px">
+          <label>Body text — <span id="size-label">16px</span></label>
+          <input type="range" min="14" max="20" value="16" id="size-slider" oninput="applySize(this.value)" style="width:100%;accent-color:var(--accent);margin-top:8px">
         </div>
       </div>
-
       <div style="padding:0 4px">
         <button class="btn-save" onclick="saveDesign()">Save Design</button>
       </div>
@@ -335,28 +304,28 @@
     <!-- Security -->
     <div id="pane-security" class="admin-pane">
       <div class="pane-title">Security</div>
-      <div class="pane-sub">Create or change your admin password.</div>
+      <div class="pane-sub">Change your admin password.</div>
       <div class="admin-card">
-        <h3>Admin password</h3>
+        <h3>Change password</h3>
         <div class="field">
           <label>New password</label>
-          <input type="password" id="pw-new" placeholder="Choose a password…">
+          <input type="password" id="pw-new" placeholder="Minimum 6 characters">
         </div>
         <div class="field">
-          <label>Confirm password</label>
-          <input type="password" id="pw-confirm" placeholder="Repeat your password…">
+          <label>Confirm new password</label>
+          <input type="password" id="pw-confirm" placeholder="Repeat your new password">
         </div>
         <div class="row-actions">
-          <button class="btn-save" onclick="savePassword()">Save Password</button>
+          <button class="btn-save" onclick="changePassword()">Update Password</button>
         </div>
         <p style="font-size:0.8rem;color:var(--text-muted);margin-top:16px;line-height:1.6">
-          Your password is stored securely in your browser. If you change devices, you'll need to set it again.
+          Your password is managed by Supabase. If you forget it, use <em>Forgot your password?</em> on the login screen — a reset link will be sent to <strong>kinkyfreeme@gmail.com</strong>.
         </p>
       </div>
     </div>
 
-  </div><!-- /admin-content -->
-</div><!-- /admin-layout -->
+  </div>
+</div>
 
 <footer style="text-align:center;padding:18px;border-top:1px solid var(--border);background:var(--bg2)">
   <span style="font-size:0.65rem;color:var(--text-muted);font-family:var(--font-label);letter-spacing:0.14em;text-transform:uppercase">
@@ -371,38 +340,59 @@
 <script src="app.js"></script>
 <script>
 
-// ══ THEME DEFINITIONS ════════════════════════════════════
+// ══ THEMES ════════════════════════════════════════════════
 const THEMES = {
-  rose:  { '--bg':'#fdf8f5','--bg2':'#f7f0ea','--bg3':'#f0e6dd','--surface':'#ffffff','--accent':'#b05470','--accent2':'#d4849a','--accent-lt':'#f4dde4','--text':'#2a1a22','--text-mid':'#6a4a56','--text-muted':'#a07888','--border':'rgba(176,84,112,0.14)','--shadow':'rgba(176,84,112,0.08)','--glow':'rgba(176,84,112,0.10)' },
-  noir:  { '--bg':'#0d0d0d','--bg2':'#141414','--bg3':'#1a1a1a','--surface':'#1f1f1f','--accent':'#d4af6e','--accent2':'#e8cfa0','--accent-lt':'#2a2318','--text':'#f0ead8','--text-mid':'#b8a880','--text-muted':'#7a6a50','--border':'rgba(212,175,110,0.15)','--shadow':'rgba(212,175,110,0.08)','--glow':'rgba(212,175,110,0.08)' },
-  blush: { '--bg':'#fff3f5','--bg2':'#ffe8ed','--bg3':'#ffd8e0','--surface':'#ffffff','--accent':'#d45070','--accent2':'#e890a8','--accent-lt':'#fde0e8','--text':'#3a1020','--text-mid':'#7a3048','--text-muted':'#b07088','--border':'rgba(212,80,112,0.15)','--shadow':'rgba(212,80,112,0.08)','--glow':'rgba(212,80,112,0.08)' },
-  sage:  { '--bg':'#f5f7f5','--bg2':'#eaf0ea','--bg3':'#dde8dd','--surface':'#ffffff','--accent':'#5a8a6a','--accent2':'#88b898','--accent-lt':'#ddeedd','--text':'#1a2a1a','--text-mid':'#3a5a3a','--text-muted':'#7a9a7a','--border':'rgba(90,138,106,0.15)','--shadow':'rgba(90,138,106,0.08)','--glow':'rgba(90,138,106,0.08)' }
+  rose:  {'--bg':'#fdf8f5','--bg2':'#f7f0ea','--bg3':'#f0e6dd','--surface':'#ffffff','--accent':'#b05470','--accent2':'#d4849a','--accent-lt':'#f4dde4','--text':'#2a1a22','--text-mid':'#6a4a56','--text-muted':'#a07888','--border':'rgba(176,84,112,0.14)','--shadow':'rgba(176,84,112,0.08)','--glow':'rgba(176,84,112,0.10)'},
+  noir:  {'--bg':'#0d0d0d','--bg2':'#141414','--bg3':'#1a1a1a','--surface':'#1f1f1f','--accent':'#d4af6e','--accent2':'#e8cfa0','--accent-lt':'#2a2318','--text':'#f0ead8','--text-mid':'#b8a880','--text-muted':'#7a6a50','--border':'rgba(212,175,110,0.15)','--shadow':'rgba(212,175,110,0.08)','--glow':'rgba(212,175,110,0.08)'},
+  blush: {'--bg':'#fff3f5','--bg2':'#ffe8ed','--bg3':'#ffd8e0','--surface':'#ffffff','--accent':'#d45070','--accent2':'#e890a8','--accent-lt':'#fde0e8','--text':'#3a1020','--text-mid':'#7a3048','--text-muted':'#b07088','--border':'rgba(212,80,112,0.15)','--shadow':'rgba(212,80,112,0.08)','--glow':'rgba(212,80,112,0.08)'},
+  sage:  {'--bg':'#f5f7f5','--bg2':'#eaf0ea','--bg3':'#dde8dd','--surface':'#ffffff','--accent':'#5a8a6a','--accent2':'#88b898','--accent-lt':'#ddeedd','--text':'#1a2a1a','--text-mid':'#3a5a3a','--text-muted':'#7a9a7a','--border':'rgba(90,138,106,0.15)','--shadow':'rgba(90,138,106,0.08)','--glow':'rgba(90,138,106,0.08)'}
 };
-
 const FONTS = {
-  cormorant: "'Cormorant Garamond', serif",
-  playfair:  "'Playfair Display', serif",
-  garamond:  "'EB Garamond', serif",
-  josefin:   "'Josefin Sans', sans-serif"
+  cormorant:"'Cormorant Garamond', serif",
+  playfair:"'Playfair Display', serif",
+  garamond:"'EB Garamond', serif",
+  josefin:"'Josefin Sans', sans-serif"
 };
 
-// ══ LOGIN ═════════════════════════════════════════════════
-function checkLogin() {
-  const stored = localStorage.getItem('kfm_admin_pw');
-  const input  = document.getElementById('pw-input').value;
-
-  // No password set yet — let her in and prompt to create one
-  if (!stored) {
-    openAdmin();
-    document.getElementById('login-hint').style.display = 'block';
+// ══ AUTH ══════════════════════════════════════════════════
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw    = document.getElementById('login-pw').value;
+  const { error } = await _sb.auth.signInWithPassword({ email, password: pw });
+  if (error) {
+    document.getElementById('login-error').style.display = 'block';
     return;
   }
-  if (input === stored) {
-    openAdmin();
-  } else {
-    document.getElementById('login-error').style.display = 'block';
-    document.getElementById('pw-input').value = '';
-  }
+  openAdmin();
+}
+
+async function doLogout() {
+  await _sb.auth.signOut();
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-pw').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+async function doReset() {
+  const email = document.getElementById('login-email').value.trim() || 'kinkyfreeme@gmail.com';
+  await _sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.href
+  });
+  document.getElementById('reset-msg').style.display = 'block';
+}
+
+async function changePassword() {
+  const pw1 = document.getElementById('pw-new').value;
+  const pw2 = document.getElementById('pw-confirm').value;
+  if (!pw1) { showToast('Please enter a new password.'); return; }
+  if (pw1 !== pw2) { showToast('Passwords do not match.'); return; }
+  if (pw1.length < 6) { showToast('Minimum 6 characters.'); return; }
+  const { error } = await _sb.auth.updateUser({ password: pw1 });
+  if (error) { showToast('Error updating password.'); return; }
+  document.getElementById('pw-new').value = '';
+  document.getElementById('pw-confirm').value = '';
+  showToast('Password updated ✦');
 }
 
 function openAdmin() {
@@ -412,14 +402,13 @@ function openAdmin() {
   loadDesignState();
 }
 
-function logout() {
-  document.getElementById('admin-panel').style.display  = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('pw-input').value = '';
-  document.getElementById('login-error').style.display  = 'none';
+// Check if already logged in
+async function checkSession() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session) openAdmin();
 }
 
-// ══ PANE SWITCHING ════════════════════════════════════════
+// ══ PANES ═════════════════════════════════════════════════
 function switchPane(name, el) {
   document.querySelectorAll('.admin-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
@@ -427,41 +416,36 @@ function switchPane(name, el) {
   el.classList.add('active');
   loadPane(name);
 }
-
 async function loadPane(name) {
-  if (name === 'overview')        await loadOverview();
-  if (name === 'all-posts')       await loadAllPosts();
-  if (name === 'subscribers')     await loadSubscribers();
-  if (name === 'about-settings')  await loadAboutForm();
-  if (name === 'site-settings')   await loadSiteForm();
+  if (name === 'overview')       await loadOverview();
+  if (name === 'all-posts')      await loadAllPosts();
+  if (name === 'subscribers')    await loadSubscribers();
+  if (name === 'about-settings') await loadAboutForm();
+  if (name === 'site-settings')  await loadSiteForm();
   if (name === 'design-settings') loadDesignState();
 }
 
 // ══ OVERVIEW ══════════════════════════════════════════════
 async function loadOverview() {
   const { data: posts } = await _sb.from('posts').select('id,title,tag,status,created_at').order('created_at',{ascending:false});
-  const { count: subCount } = await _sb.from('subscribers').select('*',{count:'exact',head:true});
-  const pub  = (posts||[]).filter(p=>p.status==='published').length;
-  const drfs = (posts||[]).filter(p=>p.status==='draft').length;
-  setEl('ov-published', pub);
-  setEl('ov-drafts', drfs);
-  setEl('ov-subs', subCount||0);
+  const { count: sc }   = await _sb.from('subscribers').select('*',{count:'exact',head:true});
+  setEl('ov-published', (posts||[]).filter(p=>p.status==='published').length);
+  setEl('ov-drafts',    (posts||[]).filter(p=>p.status==='draft').length);
+  setEl('ov-subs', sc||0);
   document.getElementById('ov-recent').innerHTML = (posts||[]).slice(0,6).map(p=>`
     <tr>
-      <td>${p.title}</td>
-      <td>${KFM.tagLabel(p.tag)}</td>
+      <td>${p.title}</td><td>${KFM.tagLabel(p.tag)}</td>
       <td><span class="status-pill ${p.status==='published'?'pub':'draft'}">${p.status}</span></td>
       <td>${KFM.formatDate(p.created_at)}</td>
     </tr>`).join('') || '<tr><td colspan="4" style="color:var(--text-muted)">No posts yet.</td></tr>';
 }
 
-// ══ ALL POSTS ═════════════════════════════════════════════
+// ══ POSTS ═════════════════════════════════════════════════
 async function loadAllPosts() {
   const { data: posts } = await _sb.from('posts').select('*').order('created_at',{ascending:false});
   document.getElementById('posts-tbody').innerHTML = (posts||[]).map(p=>`
     <tr>
-      <td>${p.title}</td>
-      <td>${KFM.tagLabel(p.tag)}</td>
+      <td>${p.title}</td><td>${KFM.tagLabel(p.tag)}</td>
       <td><span class="status-pill ${p.status==='published'?'pub':'draft'}">${p.status}</span></td>
       <td>${p.premium==='yes'?'✦':'—'}</td>
       <td>${KFM.formatDate(p.created_at)}</td>
@@ -488,7 +472,7 @@ async function savePost(status) {
   const { error } = editId
     ? await _sb.from('posts').update(payload).eq('id', editId)
     : await _sb.from('posts').insert(payload);
-  if (error) { showToast('Error saving post.'); return; }
+  if (error) { showToast('Error saving post.'); console.error(error); return; }
   resetPostForm();
   showToast(status === 'published' ? 'Post published! ✦' : 'Draft saved.');
   switchPane('all-posts', document.querySelectorAll('.sidebar-item')[2]);
@@ -499,8 +483,8 @@ function resetPostForm() {
   document.getElementById('np-tag').value = 'self-discovery';
   document.getElementById('np-premium').value = 'no';
   document.getElementById('np-edit-id').value = '';
-  document.getElementById('np-photo-preview').style.display = 'none';
-  document.getElementById('np-photo-label').textContent = 'Tap to choose a photo from your device';
+  document.getElementById('np-thumb').style.display = 'none';
+  document.getElementById('np-photo-label').textContent = 'Choose from your phone';
   document.getElementById('cancel-edit-btn').style.display = 'none';
 }
 
@@ -512,13 +496,13 @@ async function editPost(id) {
   document.getElementById('np-tag').value      = data.tag;
   document.getElementById('np-body').value     = data.body;
   document.getElementById('np-premium').value  = data.premium;
-  document.getElementById('np-photo-url').value  = data.photo_url || '';
+  document.getElementById('np-photo-url').value = data.photo_url || '';
+  document.getElementById('np-edit-id').value  = data.id;
   if (data.photo_url) {
-    const prev = document.getElementById('np-photo-preview');
-    prev.src = data.photo_url; prev.style.display = 'block';
+    const t = document.getElementById('np-thumb');
+    t.src = data.photo_url; t.style.display = 'block';
     document.getElementById('np-photo-label').textContent = 'Photo loaded — tap to change';
   }
-  document.getElementById('np-edit-id').value  = data.id;
   document.getElementById('cancel-edit-btn').style.display = 'inline-block';
   switchPane('new-post', document.querySelectorAll('.sidebar-item')[1]);
 }
@@ -536,11 +520,12 @@ async function deletePost(id) {
 // ══ SUBSCRIBERS ═══════════════════════════════════════════
 async function loadSubscribers() {
   const { data: subs, count } = await _sb.from('subscribers').select('*',{count:'exact'}).order('created_at',{ascending:false});
-  const weekAgo = new Date(Date.now()-7*86400000).toISOString();
-  const { count: wk } = await _sb.from('subscribers').select('*',{count:'exact',head:true}).gte('created_at',weekAgo);
+  const wk = new Date(Date.now()-7*86400000).toISOString();
+  const { count: wkc } = await _sb.from('subscribers').select('*',{count:'exact',head:true}).gte('created_at',wk);
   setEl('subs-total', count||0);
-  setEl('subs-week', wk||0);
-  document.getElementById('subs-tbody').innerHTML = (subs||[]).map(s=>`<tr><td>${s.email}</td><td>${KFM.formatDate(s.created_at)}</td></tr>`).join('')
+  setEl('subs-week', wkc||0);
+  document.getElementById('subs-tbody').innerHTML = (subs||[]).map(s=>`
+    <tr><td>${s.email}</td><td>${KFM.formatDate(s.created_at)}</td></tr>`).join('')
     || '<tr><td colspan="2" style="color:var(--text-muted);padding:16px">No subscribers yet.</td></tr>';
 }
 
@@ -553,25 +538,24 @@ async function loadAboutForm() {
   setVal('ab-bio',      data.bio_text);
   if (data.photo_about) {
     document.getElementById('ab-photo-url').value = data.photo_about;
-    const prev = document.getElementById('ab-photo-preview');
-    prev.src = data.photo_about; prev.style.display = 'block';
+    const t = document.getElementById('ab-thumb');
+    t.src = data.photo_about; t.style.display = 'block';
     document.getElementById('ab-photo-label').textContent = 'Photo loaded — tap to change';
   }
 }
 
 async function saveAbout() {
-  const photoUrl = document.getElementById('ab-photo-url').value || null;
   const { error } = await _sb.from('settings').update({
     bio_headline: document.getElementById('ab-headline').value.trim(),
     bio_quote:    document.getElementById('ab-quote').value.trim(),
     bio_text:     document.getElementById('ab-bio').value.trim(),
-    photo_about:  photoUrl,
+    photo_about:  document.getElementById('ab-photo-url').value || null,
   }).eq('id',1);
   if (error) { showToast('Error saving.'); return; }
   showToast('About page saved ✦');
 }
 
-// ══ SITE INFO ═════════════════════════════════════════════
+// ══ SITE SETTINGS ═════════════════════════════════════════
 async function loadSiteForm() {
   const { data } = await _sb.from('settings').select('*').eq('id',1).single();
   if (!data) return;
@@ -590,101 +574,67 @@ async function saveSettings() {
   showToast('Settings saved.');
 }
 
+// ══ PHOTO UPLOAD → SUPABASE STORAGE ══════════════════════
+async function uploadPhoto(input, labelId, thumbId, urlFieldId) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById(labelId).textContent = 'Uploading…';
+  const path = `uploads/${Date.now()}.${file.name.split('.').pop()}`;
+  const { error } = await _sb.storage.from('media').upload(path, file, { upsert: true });
+  if (error) {
+    showToast('Upload failed. Check Supabase Storage.');
+    document.getElementById(labelId).textContent = 'Choose from your phone';
+    console.error(error); return;
+  }
+  const { data } = _sb.storage.from('media').getPublicUrl(path);
+  document.getElementById(urlFieldId).value = data.publicUrl;
+  const thumb = document.getElementById(thumbId);
+  thumb.src = data.publicUrl; thumb.style.display = 'block';
+  document.getElementById(labelId).textContent = '✓ Uploaded — tap to change';
+  showToast('Photo uploaded ✦');
+}
+
 // ══ DESIGN ════════════════════════════════════════════════
 function applyTheme(name, el) {
-  const vars = THEMES[name];
-  if (!vars) return;
+  const vars = THEMES[name]; if (!vars) return;
   Object.entries(vars).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
   document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
   el.classList.add('active');
   localStorage.setItem('kfm_theme', name);
 }
-
 function applyFont(name, el) {
   document.documentElement.style.setProperty('--font-display', FONTS[name]);
   document.querySelectorAll('.font-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   localStorage.setItem('kfm_font', name);
 }
-
 function applySize(val) {
-  document.documentElement.style.setProperty('--font-size-base', val + 'px');
-  document.getElementById('size-label').textContent = val + 'px';
+  document.documentElement.style.setProperty('--font-size-base', val+'px');
+  document.getElementById('size-label').textContent = val+'px';
   localStorage.setItem('kfm_size', val);
 }
-
-function saveDesign() {
-  // Already saved to localStorage in each apply function
-  showToast('Design saved ✦');
-}
-
+function saveDesign() { showToast('Design saved ✦'); }
 function loadDesignState() {
   const theme = localStorage.getItem('kfm_theme') || 'rose';
   const font  = localStorage.getItem('kfm_font')  || 'cormorant';
   const size  = localStorage.getItem('kfm_size')  || '16';
-
-  // Apply theme
   if (THEMES[theme]) Object.entries(THEMES[theme]).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
   document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s.dataset.theme === theme));
-
-  // Apply font
   if (FONTS[font]) document.documentElement.style.setProperty('--font-display', FONTS[font]);
   document.querySelectorAll('.font-pill').forEach(p => p.classList.toggle('active', p.dataset.font === font));
-
-  // Apply size
-  document.documentElement.style.setProperty('--font-size-base', size + 'px');
-  const slider = document.getElementById('size-slider');
-  const label  = document.getElementById('size-label');
-  if (slider) slider.value = size;
-  if (label)  label.textContent = size + 'px';
-}
-
-// ══ PASSWORD ══════════════════════════════════════════════
-function savePassword() {
-  const pw1 = document.getElementById('pw-new').value;
-  const pw2 = document.getElementById('pw-confirm').value;
-  if (!pw1) { showToast('Please enter a password.'); return; }
-  if (pw1 !== pw2) { showToast('Passwords do not match.'); return; }
-  if (pw1.length < 6) { showToast('Password must be at least 6 characters.'); return; }
-  localStorage.setItem('kfm_admin_pw', pw1);
-  document.getElementById('pw-new').value = '';
-  document.getElementById('pw-confirm').value = '';
-  showToast('Password saved ✦');
-}
-
-// ══ PHOTO UPLOAD → SUPABASE STORAGE ══════════════════════
-async function handlePhotoUpload(input, labelId, previewId, urlFieldId) {
-  const file = input.files[0];
-  if (!file) return;
-
-  document.getElementById(labelId).textContent = 'Uploading…';
-
-  const ext      = file.name.split('.').pop();
-  const filename = `${Date.now()}.${ext}`;
-  const path     = `uploads/${filename}`;
-
-  const { error } = await _sb.storage.from('media').upload(path, file, { upsert: true });
-  if (error) {
-    showToast('Upload failed. Check your Supabase Storage bucket.');
-    document.getElementById(labelId).textContent = 'Tap to choose a photo from your device';
-    console.error(error);
-    return;
-  }
-
-  const { data } = _sb.storage.from('media').getPublicUrl(path);
-  const url = data.publicUrl;
-
-  document.getElementById(urlFieldId).value = url;
-  const prev = document.getElementById(previewId);
-  prev.src = url; prev.style.display = 'block';
-  document.getElementById(labelId).textContent = '✓ Photo uploaded — tap to change';
-  showToast('Photo uploaded ✦');
+  document.documentElement.style.setProperty('--font-size-base', size+'px');
+  const sl = document.getElementById('size-slider');
+  const lb = document.getElementById('size-label');
+  if (sl) sl.value = size;
+  if (lb) lb.textContent = size+'px';
 }
 
 // ══ UTILS ═════════════════════════════════════════════════
 function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
 function setVal(id, val) { const el = document.getElementById(id); if (el && val != null) el.value = val; }
 
+// ══ INIT ══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', checkSession);
 </script>
 </body>
 </html>
