@@ -114,6 +114,8 @@
     <div class="sidebar-item active" onclick="switchPane('overview',this)">📊 Overview</div>
     <div class="sidebar-item" onclick="switchPane('new-post',this)">✍️ New Post</div>
     <div class="sidebar-item" onclick="switchPane('all-posts',this)">📝 All Posts</div>
+    <div class="sidebar-item" onclick="switchPane('comments',this)">💬 Comments</div>
+    <div class="sidebar-item" onclick="switchPane('analytics',this)">📈 Analytics</div>
     <div class="sidebar-item" onclick="switchPane('subscribers',this)">💌 Subscribers</div>
     <div class="sidebar-label" style="margin-top:28px">Settings</div>
     <div class="sidebar-item" onclick="switchPane('about-settings',this)">👤 About Page</div>
@@ -204,6 +206,43 @@
         <table class="data-table">
           <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Premium</th><th>Date</th><th></th></tr></thead>
           <tbody id="posts-tbody"><tr><td colspan="6" style="color:var(--text-muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div id="pane-comments" class="admin-pane">
+      <div class="pane-title">Comments</div>
+      <div class="pane-sub">Approve, reply, or delete reader comments.</div>
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="btn-outline" onclick="filterComments('pending',this)" style="padding:8px 18px;font-size:0.7rem">⏳ Pending</button>
+        <button class="btn-outline" onclick="filterComments('approved',this)" style="padding:8px 18px;font-size:0.7rem">✅ Approved</button>
+        <button class="btn-outline" onclick="filterComments('all',this)" style="padding:8px 18px;font-size:0.7rem">All</button>
+      </div>
+      <div id="comments-admin-list"><p style="color:var(--text-muted)">Loading…</p></div>
+    </div>
+
+    <!-- Analytics -->
+    <div id="pane-analytics" class="admin-pane">
+      <div class="pane-title">Analytics</div>
+      <div class="pane-sub">Reads, likes, and where your readers come from.</div>
+      <div class="stats-row" style="margin-bottom:28px">
+        <div class="stat-box"><div class="stat-num" id="an-reads">—</div><div class="stat-lbl">Total reads</div></div>
+        <div class="stat-box"><div class="stat-num" id="an-likes">—</div><div class="stat-lbl">Total likes</div></div>
+        <div class="stat-box"><div class="stat-num" id="an-comments">—</div><div class="stat-lbl">Comments</div></div>
+      </div>
+      <div class="admin-card">
+        <h3>📖 Reads by post</h3>
+        <table class="data-table">
+          <thead><tr><th>Post</th><th>Reads</th><th>Likes</th></tr></thead>
+          <tbody id="an-posts-tbody"></tbody>
+        </table>
+      </div>
+      <div class="admin-card">
+        <h3>🌍 Readers by country</h3>
+        <table class="data-table">
+          <thead><tr><th>Country</th><th>Reads</th></tr></thead>
+          <tbody id="an-countries-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -522,12 +561,14 @@ function switchPane(name, el) {
   loadPane(name);
 }
 async function loadPane(name) {
-  if (name === 'overview')       await loadOverview();
-  if (name === 'all-posts')      await loadAllPosts();
-  if (name === 'subscribers')    await loadSubscribers();
-  if (name === 'about-settings') await loadAboutForm();
-  if (name === 'site-settings')  await loadSiteForm();
+  if (name === 'overview')        await loadOverview();
+  if (name === 'all-posts')       await loadAllPosts();
+  if (name === 'subscribers')     await loadSubscribers();
+  if (name === 'about-settings')  await loadAboutForm();
+  if (name === 'site-settings')   await loadSiteForm();
   if (name === 'design-settings') loadDesignState();
+  if (name === 'comments')        await loadComments('pending');
+  if (name === 'analytics')       await loadAnalytics();
 }
 
 // ══ OVERVIEW ══════════════════════════════════════════════
@@ -739,6 +780,109 @@ function loadDesignState() {
   const lb = document.getElementById('size-label');
   if (sl) sl.value = size;
   if (lb) lb.textContent = size+'px';
+}
+
+// ══ COMMENTS ══════════════════════════════════════════════
+let currentCommentFilter = 'pending';
+
+async function loadComments(filter) {
+  currentCommentFilter = filter;
+  let query = _sb.from('comments').select('*, posts(title)').order('created_at', {ascending:false});
+  if (filter !== 'all') query = query.eq('status', filter);
+  const { data: comments } = await query;
+
+  const list = document.getElementById('comments-admin-list');
+  if (!comments || !comments.length) {
+    list.innerHTML = `<p style="color:var(--text-muted);font-size:0.9rem">No ${filter} comments.</p>`;
+    return;
+  }
+  list.innerHTML = comments.map(c => `
+    <div class="admin-card" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div>
+          <span style="font-family:var(--font-label);font-size:0.68rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent)">${c.author_name}</span>
+          <span style="font-size:0.72rem;color:var(--text-muted);margin-left:10px">${KFM.formatDate(c.created_at)}</span>
+          ${c.posts ? `<span style="font-size:0.72rem;color:var(--text-muted);margin-left:10px">on: ${c.posts.title}</span>` : ''}
+        </div>
+        <span style="font-family:var(--font-label);font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--text-muted)">${c.status}</span>
+      </div>
+      <p style="font-size:0.92rem;color:var(--text);line-height:1.65;margin-bottom:14px">${c.body}</p>
+      ${c.reply ? `<div style="background:var(--bg2);border-left:2px solid var(--accent);padding:10px 14px;border-radius:0 3px 3px 0;font-size:0.86rem;color:var(--text-muted);margin-bottom:14px"><span style="font-family:var(--font-label);font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:4px">Your reply</span>${c.reply}</div>` : ''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:${c.status !== 'approved' ? '12px' : '0'}">
+        ${c.status !== 'approved' ? `<button class="tbl-btn" onclick="approveComment(${c.id})" style="color:#2e8a4f">✅ Approve</button>` : ''}
+        <button class="tbl-btn del" onclick="deleteComment(${c.id})">🗑 Delete</button>
+      </div>
+      <div id="reply-area-${c.id}" style="display:none">
+        <textarea style="width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font-ui);font-size:0.88rem;min-height:80px;outline:none;resize:vertical" placeholder="Write your reply…" id="reply-text-${c.id}"></textarea>
+        <button class="btn-save" style="margin-top:8px;padding:9px 20px;font-size:0.68rem" onclick="submitReply(${c.id})">Send Reply</button>
+      </div>
+      <button class="tbl-btn" onclick="toggleReply(${c.id})" style="margin-top:4px">💬 Reply</button>
+    </div>`).join('');
+}
+
+function filterComments(filter, btn) {
+  document.querySelectorAll('#pane-comments .btn-outline').forEach(b => {
+    b.style.color = ''; b.style.borderColor = '';
+  });
+  btn.style.color = 'var(--accent)'; btn.style.borderColor = 'var(--accent)';
+  loadComments(filter);
+}
+
+async function approveComment(id) {
+  await _sb.from('comments').update({ status: 'approved' }).eq('id', id);
+  showToast('Comment approved ✦');
+  loadComments(currentCommentFilter);
+}
+
+async function deleteComment(id) {
+  if (!confirm('Delete this comment?')) return;
+  await _sb.from('comments').delete().eq('id', id);
+  showToast('Comment deleted.');
+  loadComments(currentCommentFilter);
+}
+
+function toggleReply(id) {
+  const area = document.getElementById('reply-area-' + id);
+  area.style.display = area.style.display === 'none' ? 'block' : 'none';
+}
+
+async function submitReply(id) {
+  const text = document.getElementById('reply-text-' + id).value.trim();
+  if (!text) return;
+  await _sb.from('comments').update({ reply: text, status: 'approved' }).eq('id', id);
+  showToast('Reply sent ✦');
+  loadComments(currentCommentFilter);
+}
+
+// ══ ANALYTICS ═════════════════════════════════════════════
+async function loadAnalytics() {
+  const { count: totalReads }    = await _sb.from('reads').select('*', {count:'exact', head:true});
+  const { count: totalLikes }    = await _sb.from('likes').select('*', {count:'exact', head:true});
+  const { count: totalComments } = await _sb.from('comments').select('*', {count:'exact', head:true});
+  setEl('an-reads',    totalReads    || 0);
+  setEl('an-likes',    totalLikes    || 0);
+  setEl('an-comments', totalComments || 0);
+
+  // Reads + likes by post
+  const { data: posts } = await _sb.from('posts').select('id,title').eq('status','published');
+  const tbody = document.getElementById('an-posts-tbody');
+  if (posts && tbody) {
+    const rows = await Promise.all(posts.map(async p => {
+      const { count: r } = await _sb.from('reads').select('*',{count:'exact',head:true}).eq('post_id', p.id);
+      const { count: l } = await _sb.from('likes').select('*',{count:'exact',head:true}).eq('post_id', p.id);
+      return `<tr><td>${p.title}</td><td>${r||0}</td><td>${l||0}</td></tr>`;
+    }));
+    tbody.innerHTML = rows.join('') || '<tr><td colspan="3" style="color:var(--text-muted)">No data yet.</td></tr>';
+  }
+
+  // Reads by country
+  const { data: reads } = await _sb.from('reads').select('country');
+  const countryMap = {};
+  (reads||[]).forEach(r => { const c = r.country||'Unknown'; countryMap[c] = (countryMap[c]||0)+1; });
+  const sorted = Object.entries(countryMap).sort((a,b)=>b[1]-a[1]);
+  const ctbody = document.getElementById('an-countries-tbody');
+  if (ctbody) ctbody.innerHTML = sorted.map(([c,n]) => `<tr><td>${c}</td><td>${n}</td></tr>`).join('')
+    || '<tr><td colspan="2" style="color:var(--text-muted)">No data yet.</td></tr>';
 }
 
 // ══ UTILS ═════════════════════════════════════════════════

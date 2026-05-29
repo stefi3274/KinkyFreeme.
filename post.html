@@ -8,6 +8,74 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital,wght@0,400;1,400&family=Bodoni+Moda:ital,wght@0,400;1,400&family=Lora:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;1,400&family=DM+Serif+Display:ital@0;1&family=Jost:wght@300;400&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <style>
+    /* ── Engagement bar ── */
+    .engage-bar {
+      display: flex; align-items: center; gap: 16px;
+      padding: 24px 0; margin: 40px 0 0;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .engage-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 30px; padding: 10px 20px;
+      font-family: var(--font-label); font-size: 0.72rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text-muted); cursor: pointer;
+      transition: all 0.2s;
+    }
+    .engage-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .engage-btn.liked { background: var(--accent-lt); border-color: var(--accent); color: var(--accent); }
+    .engage-btn .count { font-size: 0.9rem; font-family: var(--font-display); }
+
+    /* ── Comments ── */
+    .comments-section { margin-top: 56px; }
+    .comments-title {
+      font-family: var(--font-display); font-size: 1.6rem;
+      font-weight: 300; color: var(--text); margin-bottom: 32px;
+    }
+    .comment-form { margin-bottom: 40px; }
+    .comment-form input, .comment-form textarea {
+      width: 100%; padding: 12px 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text);
+      font-family: var(--font-ui); font-size: 0.92rem;
+      outline: none; transition: border-color 0.2s; margin-bottom: 12px;
+    }
+    .comment-form input:focus, .comment-form textarea:focus { border-color: var(--accent); }
+    .comment-form textarea { min-height: 100px; resize: vertical; }
+    .comment-submit {
+      background: var(--accent); color: #fff; border: none;
+      padding: 11px 28px; border-radius: var(--radius);
+      font-family: var(--font-label); font-size: 0.72rem;
+      letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .comment-submit:hover { opacity: 0.85; }
+    .comment-item {
+      padding: 20px 0; border-bottom: 1px solid var(--border);
+    }
+    .comment-author {
+      font-family: var(--font-label); font-size: 0.7rem;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 6px;
+    }
+    .comment-date { color: var(--text-muted); font-size: 0.68rem; margin-left: 10px; }
+    .comment-body { font-size: 0.94rem; color: var(--text); line-height: 1.7; }
+    .comment-reply {
+      margin-top: 14px; padding: 14px 18px;
+      background: var(--bg2); border-left: 2px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: 0.88rem; color: var(--text-muted); line-height: 1.65;
+    }
+    .comment-reply-label {
+      font-family: var(--font-label); font-size: 0.62rem;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-bottom: 6px;
+    }
+    .no-comments { font-size: 0.9rem; color: var(--text-muted); font-style: italic; }
+  </style>
 </head>
 <body>
 
@@ -38,8 +106,11 @@
 </div>
 
 <footer class="site-footer">
-  <div class="footer-bottom" style="justify-content:center">
+  <div class="footer-bottom" style="justify-content:center;flex-direction:column;gap:8px;text-align:center">
     <a href="blog.html" style="font-family:var(--font-label);font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted)">← Back to Journal</a>
+    <span style="font-size:0.65rem;color:var(--text-muted);font-family:var(--font-label);letter-spacing:0.12em;text-transform:uppercase">
+      Created by <a href="mailto:mervilstevenson@gmail.com" style="color:var(--accent)">SteFi Services</a>
+    </span>
   </div>
 </footer>
 
@@ -47,79 +118,48 @@
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script>
-  // Age gate
-  document.getElementById('age-gate').outerHTML = `
-  <div id="age-gate">
-    <div class="age-box">
-      <div class="logo-ag">Kinky, <em>Free Me</em></div>
-      <div class="age-line"></div>
-      <h2>Are you 18 or older?</h2>
-      <p>This site contains adult content. Please confirm your age to continue.</p>
-      <div class="age-btns">
-        <button class="btn btn-primary" onclick="ageConfirm()">Yes, I'm 18+</button>
-        <button class="btn btn-ghost" onclick="ageLeave()">No, take me back</button>
-      </div>
+// Age gate
+document.getElementById('age-gate').outerHTML = `
+<div id="age-gate">
+  <div class="age-box">
+    <div class="logo-ag">Kinky, <em>Free Me</em></div>
+    <div class="age-line"></div>
+    <h2>Are you 18 or older?</h2>
+    <p>This site contains adult content. Please confirm your age to continue.</p>
+    <div class="age-btns">
+      <button class="btn btn-primary" onclick="ageConfirm()">Yes, I'm 18+</button>
+      <button class="btn btn-ghost" onclick="ageLeave()">No, take me back</button>
     </div>
-  </div>`;
+  </div>
+</div>`;
 
-  const id = parseInt(sessionStorage.getItem('kfm_read_id'));
-  const post = KFM.getPosts().find(p => p.id === id);
-  const wrap = document.getElementById('post-wrap');
+// ── Fingerprint (simple, no tracking) ──────────────────
+function getFingerprint() {
+  let fp = localStorage.getItem('kfm_fp');
+  if (!fp) { fp = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('kfm_fp', fp); }
+  return fp;
+}
 
-  if (!post) {
-    wrap.innerHTML = `<p class="post-back" onclick="history.back()">← Back</p><p style="color:var(--text-muted)">Post not found.</p>`;
-  } else {
-    const label = KFM.tagLabel(post.tag);
-    const paras = post.body.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
-    const isMember = KFM.isSubscribed();
-    const isPremium = post.premium === 'yes';
+// ── Get country via free API ────────────────────────────
+async function getCountry() {
+  try {
+    const r = await fetch('https://ipapi.co/country_name/');
+    return await r.text();
+  } catch { return 'Unknown'; }
+}
 
-    const cover = post.photo
-      ? `<div class="post-cover"><img src="${post.photo}" alt="${post.title}"></div>`
-      : `<div class="post-cover"><div class="post-cover-placeholder">✦</div></div>`;
-
-    let bodyHtml;
-    if (isPremium && !isMember) {
-      const preview = post.body.split('\n').filter(l => l.trim()).slice(0,2).map(l=>`<p>${l}</p>`).join('');
-      const rest    = post.body.split('\n').filter(l => l.trim()).slice(2).map(l=>`<p>${l}</p>`).join('');
-      bodyHtml = `
-        <div class="post-body">${preview}</div>
-        <div class="post-body blur-zone">${rest}</div>
-        <div class="premium-gate">
-          <h3>This story is for members</h3>
-          <p>Subscribe (it's free) to unlock this piece and every premium story.</p>
-          <button class="btn btn-primary" onclick="document.getElementById('post-newsletter').style.display='block';document.getElementById('post-newsletter').scrollIntoView({behavior:'smooth'})">Join the Circle — Free</button>
-        </div>`;
-    } else {
-      bodyHtml = `<div class="post-body">${paras}</div>`;
-      document.getElementById('post-newsletter').style.display = 'block';
-    }
-
-    document.title = post.title + ' — Kinky, Free Me';
-    wrap.innerHTML = `
-      <span class="post-back" onclick="history.back()">← Back to Journal</span>
-      <div class="post-tag">${label}</div>
-      <h1 class="post-title">${post.title}</h1>
-      ${post.subtitle ? `<p class="post-subtitle">${post.subtitle}</p>` : ''}
-      <div class="post-meta">
-        <span>Gia Curls</span>
-        <span>${KFM.formatDate(post.date)}</span>
-        <span>${isPremium ? '✦ Members' : 'Free read'}</span>
-      </div>
-      ${cover}
-      ${bodyHtml}`;
-  }
-</script>
-</body>
-</html>
-<script>
+// ── Load post ───────────────────────────────────────────
 (async () => {
   const id   = parseInt(sessionStorage.getItem('kfm_read_id'));
   const wrap = document.getElementById('post-wrap');
   if (!id) { wrap.innerHTML = '<span class="post-back" onclick="history.back()">← Back</span><p style="color:var(--text-muted)">Post not found.</p>'; return; }
 
-  const { data: post } = await _sb.from('posts').select('*').eq('id',id).single();
+  const { data: post } = await _sb.from('posts').select('*').eq('id', id).single();
   if (!post) { wrap.innerHTML = '<span class="post-back" onclick="history.back()">← Back</span><p style="color:var(--text-muted)">Post not found.</p>'; return; }
+
+  // Register read
+  const country = await getCountry();
+  await _sb.from('reads').insert({ post_id: id, country });
 
   const label     = KFM.tagLabel(post.tag);
   const paras     = post.body.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('');
@@ -148,6 +188,7 @@
   }
 
   document.title = post.title + ' — Kinky, Free Me';
+
   wrap.innerHTML = `
     <span class="post-back" onclick="history.back()">← Back to Journal</span>
     <div class="post-tag">${label}</div>
@@ -159,6 +200,109 @@
       <span>${isPremium ? '✦ Members' : 'Free read'}</span>
     </div>
     ${cover}
-    ${bodyHtml}`;
+    ${bodyHtml}
+
+    <!-- Engagement bar -->
+    <div class="engage-bar" id="engage-bar">
+      <button class="engage-btn" id="like-btn" onclick="toggleLike(${id})">
+        <span>❤️</span> <span class="count" id="like-count">0</span>
+      </button>
+      <button class="engage-btn" onclick="scrollToComments()">
+        <span>💬</span> <span class="count" id="comment-count">0</span>
+      </button>
+      <button class="engage-btn" onclick="sharePost('${post.title.replace(/'/g,"\\'")}')">
+        <span>🔗</span> <span>Share</span>
+      </button>
+    </div>
+
+    <!-- Comments -->
+    <div class="comments-section" id="comments-section">
+      <h2 class="comments-title">Thoughts</h2>
+      <div class="comment-form">
+        <input type="text" id="c-name" placeholder="Your name">
+        <textarea id="c-body" placeholder="Leave a thought…"></textarea>
+        <button class="comment-submit" onclick="submitComment(${id})">Send</button>
+      </div>
+      <div id="comments-list"><p class="no-comments">Be the first to leave a thought.</p></div>
+    </div>`;
+
+  // Load likes + comments
+  await loadLikes(id);
+  await loadComments(id);
 })();
+
+// ── Like ────────────────────────────────────────────────
+async function loadLikes(postId) {
+  const { count } = await _sb.from('likes').select('*', {count:'exact', head:true}).eq('post_id', postId);
+  const el = document.getElementById('like-count');
+  if (el) el.textContent = count || 0;
+
+  const fp = getFingerprint();
+  const { data } = await _sb.from('likes').select('id').eq('post_id', postId).eq('fingerprint', fp).single();
+  const btn = document.getElementById('like-btn');
+  if (btn && data) btn.classList.add('liked');
+}
+
+async function toggleLike(postId) {
+  const fp  = getFingerprint();
+  const btn = document.getElementById('like-btn');
+  const { data: existing } = await _sb.from('likes').select('id').eq('post_id', postId).eq('fingerprint', fp).single();
+  if (existing) {
+    await _sb.from('likes').delete().eq('id', existing.id);
+    btn.classList.remove('liked');
+  } else {
+    await _sb.from('likes').insert({ post_id: postId, fingerprint: fp });
+    btn.classList.add('liked');
+  }
+  await loadLikes(postId);
+}
+
+// ── Share ───────────────────────────────────────────────
+function sharePost(title) {
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title, url });
+  } else {
+    navigator.clipboard.writeText(url);
+    showToast('Link copied ✦');
+  }
+}
+
+function scrollToComments() {
+  document.getElementById('comments-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Comments ────────────────────────────────────────────
+async function loadComments(postId) {
+  const { data: comments } = await _sb.from('comments')
+    .select('*').eq('post_id', postId).eq('status', 'approved')
+    .order('created_at', { ascending: true });
+
+  const countEl = document.getElementById('comment-count');
+  if (countEl) countEl.textContent = (comments||[]).length;
+
+  const list = document.getElementById('comments-list');
+  if (!list) return;
+  list.innerHTML = (comments||[]).length
+    ? (comments||[]).map(c => `
+        <div class="comment-item">
+          <div class="comment-author">${c.author_name} <span class="comment-date">${KFM.formatDate(c.created_at)}</span></div>
+          <div class="comment-body">${c.body}</div>
+          ${c.reply ? `<div class="comment-reply"><span class="comment-reply-label">Gia replied</span>${c.reply}</div>` : ''}
+        </div>`).join('')
+    : '<p class="no-comments">Be the first to leave a thought.</p>';
+}
+
+async function submitComment(postId) {
+  const name = document.getElementById('c-name').value.trim();
+  const body = document.getElementById('c-body').value.trim();
+  if (!name || !body) { showToast('Please enter your name and a message.'); return; }
+  const { error } = await _sb.from('comments').insert({ post_id: postId, author_name: name, body, status: 'pending' });
+  if (error) { showToast('Error sending. Try again.'); return; }
+  document.getElementById('c-name').value = '';
+  document.getElementById('c-body').value = '';
+  showToast('Comment sent — waiting for approval ✦');
+}
 </script>
+</body>
+</html>
