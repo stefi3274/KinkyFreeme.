@@ -150,7 +150,8 @@ async function getCountry() {
 
 // ── Load post ───────────────────────────────────────────
 (async () => {
-  const id   = parseInt(sessionStorage.getItem('kfm_read_id'));
+  const params = new URLSearchParams(window.location.search);
+  const id   = parseInt(params.get('id')) || parseInt(sessionStorage.getItem('kfm_read_id'));
   const wrap = document.getElementById('post-wrap');
   if (!id) { wrap.innerHTML = '<span class="post-back" onclick="history.back()">← Back</span><p style="color:var(--text-muted)">Post not found.</p>'; return; }
 
