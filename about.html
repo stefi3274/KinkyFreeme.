@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital,wght@0,400;1,400&family=Bodoni+Moda:ital,wght@0,400;1,400&family=Lora:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;1,400&family=DM+Serif+Display:ital@0;1&family=Jost:wght@300;400&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
 
@@ -111,22 +111,25 @@
 
   document.getElementById('yr').textContent = new Date().getFullYear();
 
-  const s = JSON.parse(localStorage.getItem('kfm_settings') || '{}');
+  (async () => {
+    const { data: s } = await _sb.from('settings').select('*').eq('id',1).single();
+    if (!s) return;
 
-  if (s.bio_headline) document.getElementById('about-headline').textContent = s.bio_headline;
-  if (s.bio_quote)    document.getElementById('about-quote').textContent = '"' + s.bio_quote + '"';
-  if (s.bio_text) {
-    document.getElementById('about-bio').innerHTML = s.bio_text
-      .split('\n').filter(l=>l.trim()).map(l=>`<p style="font-size:0.95rem;line-height:1.8;color:var(--text-muted);margin-bottom:1em">${l}</p>`).join('');
-  }
-  if (s.photo_about) {
-    document.getElementById('about-photo-wrap').innerHTML = `<img src="${s.photo_about}" alt="Gia Curls" style="width:100%;height:100%;object-fit:cover">`;
-  }
-  if (s.email || s.address) {
-    document.getElementById('about-contact-block').style.display = 'block';
-    if (s.email)   document.getElementById('about-email-display').innerHTML   = `<a href="mailto:${s.email}" style="color:var(--accent)">${s.email}</a>`;
-    if (s.address) document.getElementById('about-address-display').textContent = s.address;
-  }
+    if (s.bio_headline) document.getElementById('about-headline').textContent = s.bio_headline;
+    if (s.bio_quote)    document.getElementById('about-quote').textContent = '"' + s.bio_quote + '"';
+    if (s.bio_text) {
+      document.getElementById('about-bio').innerHTML = s.bio_text
+        .split('\n').filter(l=>l.trim()).map(l=>`<p style="font-size:0.95rem;line-height:1.8;color:var(--text-muted);margin-bottom:1em">${l}</p>`).join('');
+    }
+    if (s.photo_about) {
+      document.getElementById('about-photo-wrap').innerHTML = `<img src="${s.photo_about}" alt="Gia Curls" style="width:100%;height:100%;object-fit:cover">`;
+    }
+    if (s.email || s.address) {
+      document.getElementById('about-contact-block').style.display = 'block';
+      if (s.email)   document.getElementById('about-email-display').innerHTML   = `<a href="mailto:${s.email}" style="color:var(--accent)">${s.email}</a>`;
+      if (s.address) document.getElementById('about-address-display').textContent = s.address;
+    }
+  })();
 </script>
 </body>
 </html>

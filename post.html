@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital,wght@0,400;1,400&family=Bodoni+Moda:ital,wght@0,400;1,400&family=Lora:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;1,400&family=DM+Serif+Display:ital@0;1&family=Jost:wght@300;400&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" href="favicon.png">
   <style>
     /* ── Engagement bar ── */
     .engage-bar {
@@ -230,7 +230,24 @@ async function getCountry() {
   // Load likes + comments
   await loadLikes(id);
   await loadComments(id);
+  await loadRelated(id, post.tag);
 })();
+
+// ── Related stories ─────────────────────────────────────
+async function loadRelated(id, tag) {
+  const { data: related } = await _sb.from('posts')
+    .select('*').eq('status','published').eq('tag', tag).neq('id', id)
+    .order('created_at',{ascending:false}).limit(3);
+  if (!related || !related.length) return;
+  const section = document.createElement('div');
+  section.style.cssText = 'max-width:900px;margin:0 auto;padding:0 48px 60px';
+  section.innerHTML = `
+    <p class="section-label">Keep Reading</p>
+    <h2 class="section-title" style="margin-bottom:28px">More like this</h2>
+    <div class="blog-grid">${related.map(buildCard).join('')}</div>`;
+  document.getElementById('post-wrap').after(section);
+  initScrollReveal();
+}
 
 // ── Like ────────────────────────────────────────────────
 async function loadLikes(postId) {

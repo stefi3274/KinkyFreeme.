@@ -8,12 +8,12 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital,wght@0,400;1,400&family=Bodoni+Moda:ital,wght@0,400;1,400&family=Lora:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;1,400&family=DM+Serif+Display:ital@0;1&family=Jost:wght@300;400&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" href="favicon.png">
   <meta property="og:title" content="Kinky, Free Me">
   <meta property="og:description" content="Self discovery through self acceptance and the discovery of pleasure. A journal by Gia Curls.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://kinkyfreeme.com">
-  <meta property="og:image" content="https://kinky-freeme.vercel.app/og.svg">
+  <meta property="og:image" content="https://kinky-freeme.vercel.app/og.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Kinky, Free Me">
   <meta name="twitter:description" content="Self discovery through self acceptance and the discovery of pleasure.">
@@ -147,40 +147,27 @@
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script>
-  // Year
-  document.getElementById('yr').textContent = new Date().getFullYear();
-
-  // Load latest 3 published posts
-  const posts = KFM.getPosts().filter(p => p.status === 'published').slice(0, 3);
-  if (posts.length > 0) {
-    document.getElementById('home-posts').innerHTML = posts.map(buildCard).join('');
-  }
-
-  // Footer contact from settings
-  const settings = JSON.parse(localStorage.getItem('kfm_settings') || '{}');
-  if (settings.email) {
-    document.getElementById('footer-contact-li').style.display = 'block';
-    document.getElementById('footer-email-link').href = 'mailto:' + settings.email;
-    document.getElementById('footer-email-link').textContent = 'Contact';
-  }
-</script>
-</body>
-</html>
-<script>
-// Override: load posts from Supabase
 (async () => {
   document.getElementById('yr').textContent = new Date().getFullYear();
+
   const { data: posts } = await _sb.from('posts')
     .select('*').eq('status','published').order('created_at',{ascending:false}).limit(3);
   const grid = document.getElementById('home-posts');
   grid.innerHTML = (posts && posts.length)
     ? posts.map(buildCard).join('')
     : '<p style="color:var(--text-muted);font-size:0.9rem">No posts yet — write your first story from the Admin panel.</p>';
+  initScrollReveal();
 
   const { data: s } = await _sb.from('settings').select('email,tagline').eq('id',1).single();
   if (s && s.email) {
     document.getElementById('footer-contact-li').style.display = 'block';
     document.getElementById('footer-email-link').href = 'mailto:' + s.email;
+    document.getElementById('footer-email-link').textContent = 'Contact';
+  }
+  if (s && s.tagline) {
+    document.getElementById('footer-tagline').textContent = s.tagline;
   }
 })();
 </script>
+</body>
+</html>
