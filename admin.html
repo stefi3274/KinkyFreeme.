@@ -69,7 +69,7 @@
     .pe-title { font-family: var(--font-display); font-size: 1.2rem; color: var(--text); margin-bottom: 4px; }
     .pe-sub { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 14px; }
     #pe-canvas-wrap {
-      position: relative; width: 100%; aspect-ratio: 4/5; border-radius: 6px; overflow: hidden;
+      position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 6px; overflow: hidden;
       background: #000; touch-action: none; cursor: grab; margin-bottom: 14px;
     }
     #pe-canvas-wrap:active { cursor: grabbing; }
@@ -297,13 +297,6 @@
         <table class="data-table">
           <thead><tr><th>Post</th><th>Reads</th><th>Likes</th></tr></thead>
           <tbody id="an-posts-tbody"></tbody>
-        </table>
-      </div>
-      <div class="admin-card">
-        <h3>🌍 Readers by country</h3>
-        <table class="data-table">
-          <thead><tr><th>Country</th><th>Reads</th></tr></thead>
-          <tbody id="an-countries-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -1059,15 +1052,6 @@ async function loadAnalytics() {
     }));
     tbody.innerHTML = rows.join('') || '<tr><td colspan="3" style="color:var(--text-muted)">No data yet.</td></tr>';
   }
-
-  // Reads by country
-  const { data: reads } = await _sb.from('reads').select('country');
-  const countryMap = {};
-  (reads||[]).forEach(r => { const c = r.country||'Unknown'; countryMap[c] = (countryMap[c]||0)+1; });
-  const sorted = Object.entries(countryMap).sort((a,b)=>b[1]-a[1]);
-  const ctbody = document.getElementById('an-countries-tbody');
-  if (ctbody) ctbody.innerHTML = sorted.map(([c,n]) => `<tr><td>${c}</td><td>${n}</td></tr>`).join('')
-    || '<tr><td colspan="2" style="color:var(--text-muted)">No data yet.</td></tr>';
 }
 
 // ══ UTILS ═════════════════════════════════════════════════
@@ -1083,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', checkSession);
     <div class="pe-title">Edit Photo</div>
     <div class="pe-sub">Pinch/drag to reposition · pick a mood</div>
     <div id="pe-canvas-wrap">
-      <canvas id="pe-canvas" width="800" height="1000"></canvas>
+      <canvas id="pe-canvas" width="1000" height="562"></canvas>
     </div>
     <div class="pe-field">
       <label>Zoom</label>

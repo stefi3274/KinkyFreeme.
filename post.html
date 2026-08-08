@@ -141,14 +141,6 @@ function getFingerprint() {
   return fp;
 }
 
-// ── Get country via free API ────────────────────────────
-async function getCountry() {
-  try {
-    const r = await fetch('https://ipapi.co/country_name/');
-    return await r.text();
-  } catch { return 'Unknown'; }
-}
-
 // ── Load post ───────────────────────────────────────────
 (async () => {
   const params = new URLSearchParams(window.location.search);
@@ -160,8 +152,7 @@ async function getCountry() {
   if (!post) { wrap.innerHTML = '<span class="post-back" onclick="history.back()">← Back</span><p style="color:var(--text-muted)">Post not found.</p>'; return; }
 
   // Register read
-  const country = await getCountry();
-  await _sb.from('reads').insert({ post_id: id, country });
+  await _sb.from('reads').insert({ post_id: id });
 
   const label     = KFM.tagLabel(post.tag);
   const paras     = post.body.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('');
