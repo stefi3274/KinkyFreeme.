@@ -45,16 +45,16 @@
     .font-pill.active { border-color: var(--accent); color: var(--accent); background: var(--bg3); }
     /* ── Photo upload ── */
     .photo-upload-btn {
-      display: flex; align-items: center; gap: 12px;
-      padding: 16px 20px; border: 2px dashed var(--border);
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
+      padding: 28px 20px; border: 2px dashed var(--border);
       border-radius: var(--radius); cursor: pointer;
       background: var(--bg2); transition: border-color 0.2s;
       margin-bottom: 12px;
     }
     .photo-upload-btn:hover { border-color: var(--accent); }
-    .photo-upload-btn span { font-size: 1.6rem; }
-    .photo-upload-btn p { font-size: 0.86rem; color: var(--text-muted); margin: 0; }
-    .photo-upload-btn p strong { color: var(--text); display: block; font-size: 0.78rem; }
+    .photo-upload-btn span { font-size: 1.8rem; }
+    .photo-upload-btn p { font-size: 0.92rem; color: var(--text-muted); margin: 0; }
+    .photo-upload-btn p strong { color: var(--text); display: block; font-size: 0.98rem; margin-bottom: 2px; }
     .photo-thumb { width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius); display: none; border: 1px solid var(--border); }
     /* ── Photo editor ── */
     #pe-overlay {
@@ -91,6 +91,29 @@
     }
     #pe-cancel { background: var(--bg2); color: var(--text-muted); border: 1px solid var(--border) !important; }
     #pe-apply { background: var(--accent); color: #fff; }
+
+    /* ── Mobile nav drawer ── */
+    .admin-hamburger {
+      display: none; background: none; border: none; cursor: pointer;
+      font-size: 1.3rem; color: var(--text); padding: 6px 10px; margin-right: 4px;
+    }
+    .admin-sidebar-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 899;
+    }
+    .admin-sidebar-overlay.open { display: block; }
+    @media (max-width: 780px) {
+      .admin-hamburger { display: inline-block; }
+      .admin-layout { display: block; }
+      .admin-sidebar {
+        position: fixed; top: 0; left: -280px; height: 100vh; width: 250px;
+        z-index: 900; transition: left 0.25s ease; box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+        overflow-y: auto;
+      }
+      .admin-sidebar.open { left: 0; }
+      .admin-content { padding: 22px 18px; width: 100%; }
+      .sidebar-item { font-size: 1rem; padding: 15px 22px; }
+      .sidebar-label { font-size: 0.68rem; }
+    }
   </style>
 </head>
 <body>
@@ -138,14 +161,16 @@
 <div id="admin-panel" style="display:none">
 
 <nav class="site-nav" style="background:var(--bg2)">
+  <button class="admin-hamburger" onclick="toggleAdminSidebar()">☰</button>
   <a href="index.html" class="nav-logo">Kinky, <em>Free Me</em></a>
   <span style="font-family:var(--font-label);font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);margin-right:auto;padding-left:16px">Admin</span>
   <a href="index.html" class="nav-link">← View Site</a>
   <button onclick="doLogout()" style="background:none;border:none;font-size:0.72rem;font-family:var(--font-label);letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;margin-left:16px">Log out</button>
 </nav>
+<div class="admin-sidebar-overlay" id="admin-sidebar-overlay" onclick="toggleAdminSidebar()"></div>
 
 <div class="admin-layout">
-  <aside class="admin-sidebar">
+  <aside class="admin-sidebar" id="admin-sidebar">
     <div class="sidebar-label">Content</div>
     <div class="sidebar-item active" onclick="switchPane('overview',this)">📊 Overview</div>
     <div class="sidebar-item" onclick="switchPane('new-post',this)">✍️ New Post</div>
@@ -594,7 +619,16 @@ function switchPane(name, el) {
   document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
   document.getElementById('pane-' + name).classList.add('active');
   el.classList.add('active');
+  closeAdminSidebar();
   loadPane(name);
+}
+function toggleAdminSidebar() {
+  document.getElementById('admin-sidebar').classList.toggle('open');
+  document.getElementById('admin-sidebar-overlay').classList.toggle('open');
+}
+function closeAdminSidebar() {
+  document.getElementById('admin-sidebar').classList.remove('open');
+  document.getElementById('admin-sidebar-overlay').classList.remove('open');
 }
 async function loadPane(name) {
   if (name === 'overview')        await loadOverview();
