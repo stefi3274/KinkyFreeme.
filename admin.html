@@ -92,6 +92,19 @@
     #pe-cancel { background: var(--bg2); color: var(--text-muted); border: 1px solid var(--border) !important; }
     #pe-apply { background: var(--accent); color: #fff; }
 
+    /* ── Social Posts ── */
+    .sp-cats { display: flex; gap: 10px; flex-wrap: wrap; }
+    .sp-cat {
+      padding: 10px 20px; border-radius: 20px; font-size: 0.86rem; cursor: pointer;
+      border: 2px solid transparent; color: #fff; opacity: 0.5; transition: all 0.2s;
+      font-family: var(--font-label);
+    }
+    .sp-cat.active { opacity: 1; border-color: rgba(255,255,255,0.7); transform: scale(1.03); }
+    .sp-cat[data-cat="litterature"] { background: #B08D3E; }
+    .sp-cat[data-cat="portrait"]    { background: #C4748A; }
+    .sp-cat[data-cat="temoignages"] { background: #3E7C7A; }
+    #sp-canvas { width: 100%; max-width: 360px; border-radius: 8px; box-shadow: 0 10px 34px rgba(0,0,0,0.35); }
+
     /* ── Mobile nav drawer ── */
     .admin-hamburger {
       display: none; background: none; border: none; cursor: pointer;
@@ -178,6 +191,7 @@
     <div class="sidebar-item" onclick="switchPane('comments',this)">💬 Comments</div>
     <div class="sidebar-item" onclick="switchPane('analytics',this)">📈 Analytics</div>
     <div class="sidebar-item" onclick="switchPane('subscribers',this)">💌 Subscribers</div>
+    <div class="sidebar-item" onclick="switchPane('social',this)">🖼️ Social Posts</div>
     <div class="sidebar-label" style="margin-top:28px">Settings</div>
     <div class="sidebar-item" onclick="switchPane('about-settings',this)">👤 About Page</div>
     <div class="sidebar-item" onclick="switchPane('site-settings',this)">⚙️ Site Info</div>
@@ -316,6 +330,43 @@
           <thead><tr><th>Email</th><th>Date</th></tr></thead>
           <tbody id="subs-tbody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Social Posts -->
+    <div id="pane-social" class="admin-pane">
+      <div class="pane-title">Social Posts</div>
+      <div class="pane-sub">Square graphics to share on WhatsApp, Facebook, X.</div>
+
+      <div class="admin-card" style="max-width:640px">
+        <label style="display:block;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">Category</label>
+        <div class="sp-cats" id="sp-cats">
+          <div class="sp-cat active" data-cat="litterature" onclick="spSetCategory('litterature',this)">Littérature</div>
+          <div class="sp-cat" data-cat="portrait" onclick="spSetCategory('portrait',this)">Portrait</div>
+          <div class="sp-cat" data-cat="temoignages" onclick="spSetCategory('temoignages',this)">Témoignages</div>
+        </div>
+
+        <label style="display:block;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin:20px 0 8px">Text</label>
+        <textarea id="sp-text" rows="4" placeholder="A quote, an excerpt, a few words…" oninput="spRender()"></textarea>
+
+        <label style="display:block;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin:16px 0 8px">Signature (optional)</label>
+        <input type="text" id="sp-byline" placeholder="Gia Curls" oninput="spRender()">
+
+        <label style="display:block;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin:16px 0 8px">Background photo (optional)</label>
+        <div class="photo-upload-btn" onclick="document.getElementById('sp-file').click()">
+          <span>📷</span>
+          <p><strong id="sp-photo-label">No photo — plain background</strong>Tap to choose one</p>
+        </div>
+        <input type="file" id="sp-file" accept="image/*" style="display:none" onchange="spLoadPhoto(this)">
+
+        <div style="margin-top:22px;text-align:center">
+          <canvas id="sp-canvas" width="1080" height="1080"></canvas>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:22px">
+          <button class="btn-outline" onclick="spClearPhoto()" style="flex:1">Remove Photo</button>
+          <button class="btn-save" onclick="spDownload()" style="flex:1">⬇ Download</button>
+        </div>
       </div>
     </div>
 
@@ -632,6 +683,7 @@ async function loadPane(name) {
   if (name === 'design-settings') loadDesignState();
   if (name === 'comments')        await loadComments('pending');
   if (name === 'analytics')       await loadAnalytics();
+  if (name === 'social')          spRender();
 }
 
 // ══ OVERVIEW ══════════════════════════════════════════════
@@ -1052,6 +1104,172 @@ async function loadAnalytics() {
     }));
     tbody.innerHTML = rows.join('') || '<tr><td colspan="3" style="color:var(--text-muted)">No data yet.</td></tr>';
   }
+}
+
+// ══ SOCIAL POSTS (shareable square graphics) ═════════════
+const SP_CATS = {
+  litterature: { label: 'Littérature', color: '#B08D3E', glow: 'rgba(176,141,62,0.38)' },
+  portrait:    { label: 'Portrait',    color: '#C4748A', glow: 'rgba(196,116,138,0.38)' },
+  temoignages: { label: 'Témoignages', color: '#3E7C7A', glow: 'rgba(62,124,122,0.38)' }
+};
+let sp_state = { cat: 'litterature', photoImg: null };
+
+function spSetCategory(cat, el) {
+  sp_state.cat = cat;
+  document.querySelectorAll('.sp-cat').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  spRender();
+}
+
+function spLoadPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      sp_state.photoImg = img;
+      document.getElementById('sp-photo-label').textContent = 'Photo added — tap to change';
+      spRender();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function spClearPhoto() {
+  sp_state.photoImg = null;
+  document.getElementById('sp-photo-label').textContent = 'No photo — plain background';
+  document.getElementById('sp-file').value = '';
+  spRender();
+}
+
+function spWrapText(ctx, text, maxWidth) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = '';
+  words.forEach(w => {
+    const test = line ? line + ' ' + w : w;
+    if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
+    else line = test;
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+function spRoundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+
+function spTrackedText(ctx, text, cx, y, tracking) {
+  const chars = [...text];
+  const widths = chars.map(ch => ctx.measureText(ch).width);
+  const total = widths.reduce((a,b) => a+b, 0) + tracking * (chars.length - 1);
+  let x = cx - total / 2;
+  const prevAlign = ctx.textAlign;
+  ctx.textAlign = 'left';
+  chars.forEach((ch, i) => { ctx.fillText(ch, x, y); x += widths[i] + tracking; });
+  ctx.textAlign = prevAlign;
+}
+
+async function spRender() {
+  const canvas = document.getElementById('sp-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cat = SP_CATS[sp_state.cat];
+
+  try {
+    await Promise.all([
+      document.fonts.load('italic 400 80px "Cormorant Garamond"'),
+      document.fonts.load('600 30px "Josefin Sans"'),
+      document.fonts.load('400 22px "DM Sans"')
+    ]);
+  } catch(e) {}
+
+  ctx.clearRect(0, 0, W, H);
+
+  // ── Background ──
+  if (sp_state.photoImg) {
+    const img = sp_state.photoImg;
+    const scale = Math.max(W / img.width, H / img.height);
+    const dw = img.width * scale, dh = img.height * scale;
+    ctx.drawImage(img, W/2 - dw/2, H/2 - dh/2, dw, dh);
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, 'rgba(10,6,8,0.30)');
+    grad.addColorStop(0.55, 'rgba(10,6,8,0.55)');
+    grad.addColorStop(1, 'rgba(10,6,8,0.90)');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 0.14; ctx.fillStyle = cat.color; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1;
+  } else {
+    ctx.fillStyle = '#100a0d'; ctx.fillRect(0, 0, W, H);
+    const rg = ctx.createRadialGradient(W*0.76, H*0.26, 10, W*0.76, H*0.26, W*0.8);
+    rg.addColorStop(0, cat.glow); rg.addColorStop(1, 'rgba(16,10,13,0)');
+    ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+  }
+
+  // ── Category pill ──
+  ctx.font = '600 30px "Josefin Sans", sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  const label = cat.label.toUpperCase();
+  const textW = ctx.measureText(label).width;
+  const padX = 32, pillH = 58, pillX = 68, pillY = 68;
+  const pillW = textW + padX * 2;
+  ctx.fillStyle = cat.color;
+  spRoundRect(ctx, pillX, pillY, pillW, pillH, 29); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.fillText(label, pillX + padX, pillY + pillH/2 + 2);
+
+  // ── Main quote text (auto-sized) ──
+  const text = (document.getElementById('sp-text').value.trim()) || 'Your words here…';
+  const maxWidth = W - 170;
+  let fontSize = 84, lines, lineHeight;
+  while (fontSize > 34) {
+    ctx.font = `italic 400 ${fontSize}px "Cormorant Garamond", serif`;
+    lines = spWrapText(ctx, text, maxWidth);
+    lineHeight = fontSize * 1.24;
+    if (lines.length * lineHeight <= 470) break;
+    fontSize -= 3;
+  }
+  ctx.font = `italic 400 ${fontSize}px "Cormorant Garamond", serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#f5eef0';
+  const totalH = lines.length * lineHeight;
+  let y = H/2 - totalH/2 + fontSize*0.75;
+  lines.forEach(l => { ctx.fillText(l, W/2, y); y += lineHeight; });
+
+  // ── Bottom identity block ──
+  const byline = document.getElementById('sp-byline').value.trim();
+  if (byline) {
+    ctx.font = 'italic 400 27px "Cormorant Garamond", serif';
+    ctx.fillStyle = cat.color;
+    ctx.fillText('— ' + byline, W/2, H - 186);
+  }
+  ctx.strokeStyle = cat.color; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(W/2 - 42, H - 156); ctx.lineTo(W/2 + 42, H - 156); ctx.stroke();
+
+  ctx.font = 'italic 400 48px "Cormorant Garamond", serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('Kinky, Free Me', W/2, H - 108);
+
+  ctx.font = '400 21px "DM Sans", sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.62)';
+  spTrackedText(ctx, 'KINKYFREEME.COM', W/2, H - 72, 2.5);
+}
+
+function spDownload() {
+  const canvas = document.getElementById('sp-canvas');
+  const cat = SP_CATS[sp_state.cat].label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const link = document.createElement('a');
+  link.download = `kinky-free-me-${cat}-${Date.now()}.jpg`;
+  link.href = canvas.toDataURL('image/jpeg', 0.92);
+  link.click();
+  showToast('Downloaded ✦');
 }
 
 // ══ UTILS ═════════════════════════════════════════════════
