@@ -68,26 +68,7 @@
   <p class="section-label">Explore</p>
   <h2 class="section-title">Browse by category</h2>
   <div class="divider"></div>
-  <div class="cat-grid">
-    <a href="blog.html?tag=self-discovery" class="category-card" style="--cat:#3f7d6e">
-      <div class="cat-icon">🌸</div>
-      <div class="cat-title">Self-Discovery</div>
-      <div class="cat-desc">Understanding who you are beyond what you were told to be.</div>
-      <div class="cat-go">Read stories →</div>
-    </a>
-    <a href="blog.html?tag=submission" class="category-card" style="--cat:#7a5aa6">
-      <div class="cat-icon">🌑</div>
-      <div class="cat-title">Submission</div>
-      <div class="cat-desc">The radical freedom found in conscious surrender.</div>
-      <div class="cat-go">Read stories →</div>
-    </a>
-    <a href="blog.html?tag=bdsm" class="category-card" style="--cat:#a63a4a">
-      <div class="cat-icon">🔗</div>
-      <div class="cat-title">BDSM</div>
-      <div class="cat-desc">Exploring power, pleasure, and consent with intention.</div>
-      <div class="cat-go">Read stories →</div>
-    </a>
-  </div>
+  <div class="cat-grid" id="cat-grid"></div>
 </section>
 
 <!-- Latest posts -->
@@ -156,6 +137,13 @@
 
   const { data: posts } = await _sb.from('posts')
     .select('*').eq('status','published').order('created_at',{ascending:false}).limit(3);
+  document.getElementById('cat-grid').innerHTML = KFM.CATS.map(c => `
+    <a href="blog.html?tag=${c.key}" class="category-card" style="--cat:${c.color}">
+      <div class="cat-icon">${KFM.catImg(c.key)}</div>
+      <div class="cat-title">${c.label}</div>
+      <div class="cat-desc">${c.desc}</div>
+      <div class="cat-go">Read stories →</div>
+    </a>`).join('');
   const grid = document.getElementById('home-posts');
   grid.innerHTML = (posts && posts.length)
     ? posts.map(buildCard).join('')

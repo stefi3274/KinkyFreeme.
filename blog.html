@@ -31,12 +31,7 @@
 </div>
 
 <!-- Category tabs -->
-<div class="journal-tabs" id="journal-tabs">
-  <button class="journal-tab" data-tag="" onclick="goTag('')">All</button>
-  <button class="journal-tab" style="--cat:#3f7d6e" data-tag="self-discovery" onclick="goTag('self-discovery')">Self-Discovery</button>
-  <button class="journal-tab" style="--cat:#7a5aa6" data-tag="submission" onclick="goTag('submission')">Submission</button>
-  <button class="journal-tab" style="--cat:#a63a4a" data-tag="bdsm" onclick="goTag('bdsm')">BDSM</button>
-</div>
+<div class="journal-tabs" id="journal-tabs"></div>
 
 <section class="journal-sections" id="journal-sections">
   <p style="color:var(--text-muted)">Loading…</p>
@@ -102,11 +97,10 @@
   </div>`;
 
   // ── Category definitions (order = display order) ───────
-  const JOURNAL_CATS = [
-    { key: 'self-discovery', label: 'Self-Discovery', icon: '🌸', desc: 'Understanding who you are beyond what you were told to be.' },
-    { key: 'submission',     label: 'Submission',     icon: '🌑', desc: 'The radical freedom found in conscious surrender.' },
-    { key: 'bdsm',           label: 'BDSM',           icon: '🔗', desc: 'Exploring power, pleasure, and consent with intention.' }
-  ];
+  const JOURNAL_CATS = KFM.CATS;
+  document.getElementById('journal-tabs').innerHTML =
+    '<button class="journal-tab" data-tag="" onclick="goTag(\'\')">All</button>' +
+    JOURNAL_CATS.map(c => `<button class="journal-tab" style="--cat:${c.color}" data-tag="${c.key}" onclick="goTag('${c.key}')">${KFM.catImg(c.key)}${c.label}</button>`).join('');
   const CAT_BY_KEY = Object.fromEntries(JOURNAL_CATS.map(c => [c.key, c]));
 
   let allPosts = null; // cached after first fetch
@@ -152,7 +146,7 @@
         <div class="category-section" id="cat-${cat.key}" style="--cat:${KFM.tagColor(cat.key)}">
           <div class="category-section-head">
             <div class="category-section-id">
-              <div class="category-section-icon">${cat.icon}</div>
+              <div class="category-section-icon">${KFM.catImg(cat.key)}</div>
               <div>
                 <div class="category-section-title">${cat.label}</div>
                 <div class="category-section-desc">${cat.desc}</div>
@@ -190,7 +184,7 @@
   async function renderCategory(tag) {
     const cat = CAT_BY_KEY[tag];
     document.getElementById('hero-label').textContent = 'The Journal';
-    document.getElementById('hero-title').innerHTML = cat ? `${cat.icon} <em>${cat.label}</em>` : 'Stories';
+    document.getElementById('hero-title').innerHTML = cat ? `${KFM.catImg(cat.key)} <em>${cat.label}</em>` : 'Stories';
     document.getElementById('hero-sub').textContent = cat ? cat.desc : '';
 
     const container = document.getElementById('journal-sections');

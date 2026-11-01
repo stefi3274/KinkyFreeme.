@@ -13,12 +13,17 @@ const KFM = {
   ageVerified()  { return sessionStorage.getItem('kfm_age') === 'ok'; },
   setAge()       { sessionStorage.setItem('kfm_age', 'ok'); },
 
-  tagLabel(tag) {
-    return { 'self-discovery':'Self-Discovery', 'submission':'Submission', 'bdsm':'BDSM' }[tag] || tag;
-  },
-  tagColor(tag) {
-    return { 'self-discovery':'#3f7d6e', 'submission':'#7a5aa6', 'bdsm':'#a63a4a' }[tag] || '#b05470';
-  },
+  // Single source of truth for categories. Key 'bdsm' is kept internally (existing posts) but shown as "Kink".
+  CATS: [
+    { key:'self-discovery', label:'Self-Discovery', color:'#3f7d6e', desc:'Understanding who you are beyond what you were told to be.' },
+    { key:'self-led',       label:'Self-led',       color:'#c2557a', desc:'Leading your own desire, pace and boundaries.' },
+    { key:'submission',     label:'Submission',     color:'#7a5aa6', desc:'The radical freedom found in conscious surrender.' },
+    { key:'bdsm',           label:'Kink',           color:'#a63a4a', desc:'Exploring power, pleasure, and consent with intention.' }
+  ],
+  cat(tag)      { return this.CATS.find(c => c.key === tag); },
+  tagLabel(tag) { const c = this.cat(tag); return c ? c.label : tag; },
+  tagColor(tag) { const c = this.cat(tag); return c ? c.color : '#b05470'; },
+  catImg(tag)   { return `<img class="cat-img" src="img/cat-${tag}.jpg" alt="">`; },
   slugify(text) {
     return (text || '')
       .toLowerCase()
