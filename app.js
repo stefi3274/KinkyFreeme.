@@ -23,7 +23,7 @@ const KFM = {
   cat(tag)      { return this.CATS.find(c => c.key === tag); },
   tagLabel(tag) { const c = this.cat(tag); return c ? c.label : tag; },
   tagColor(tag) { const c = this.cat(tag); return c ? c.color : '#b05470'; },
-  catImg(tag)   { return `<img class="cat-img" src="img/cat-${tag}.jpg" alt="">`; },
+  catImg(tag)   { return `<img class="cat-img" src="cat-${tag}.jpg" alt="">`; },
   slugify(text) {
     return (text || '')
       .toLowerCase()
